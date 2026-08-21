@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/msps_dev
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      # 앱 켤 때마다 스키마를 지웠다 다시 만듦 -> msps_dev만 영향받음 (msps_prod는 안전)
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  sql:
+    init:
+      # resources/data.sql을 앱 켤 때마다 자동 실행 (prep/load.py가 export한 SQL을 복사해서 씀)
+      mode: always
+
+logging:
+  level:
+    org.hibernate.SQL: debug

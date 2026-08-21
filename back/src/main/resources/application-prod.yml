@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/msps_prod
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      # 스키마를 건드리지 않고 엔티티와 실제 테이블이 일치하는지만 검증 (prep/docker/init.sql이
+      # 이미 테이블을 만들어둔 상태라는 전제)
+      ddl-auto: validate
+    show-sql: false
+  sql:
+    init:
+      mode: never
+
+logging:
+  level:
+    org.hibernate.SQL: warn
