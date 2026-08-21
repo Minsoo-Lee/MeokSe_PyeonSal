@@ -1,0 +1,32 @@
+# ===== 공통 =====
+.DS_Store
+*.log
+
+# .env는 prep/back/front 어디에 있든 전부 무시. .env.example만 예외로 커밋 허용.
+**/.env
+!**/.env.example
+
+# ===== prep/ (파이썬) =====
+prep/venv/
+prep/__pycache__/
+prep/**/__pycache__/
+prep/*.pyc
+prep/data/
+
+# ===== back/ (Spring, Gradle 또는 Maven) =====
+back/build/
+back/target/
+back/.gradle/
+!back/gradle/wrapper/gradle-wrapper.jar
+back/out/
+back/*.class
+
+# ===== front/ (React, Node) =====
+front/node_modules/
+front/dist/
+front/.next/
+
+# ===== IDE =====
+.idea/
+.vscode/
+*.iml
