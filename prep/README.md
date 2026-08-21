@@ -36,16 +36,16 @@ DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=비밀번호
-DB_NAME=meokse_prod
+DB_NAME=msps_prod
 ```
 
 ## Docker로 MySQL 띄우기
 
 `docker-compose.yml`은 이 `prep` 폴더가 아니라 **레포 루트**에 있습니다 (`prep`, `back` 둘 다
 같은 DB를 쓰는 공유 인프라라서 특정 폴더에 종속시키지 않았습니다). 컨테이너 1개 안에
-`meokse_dev`(개발용) / `meokse_prod`(운영용) 두 개의 데이터베이스를 만듭니다. Spring `dev`
-프로파일에서 스키마를 매번 새로 만들어도(`ddl-auto=create-drop`) `meokse_dev`만 영향받고, 이
-스크립트로 수집한 실제 데이터가 들어있는 `meokse_prod`는 안전합니다.
+`msps_dev`(개발용) / `msps_prod`(운영용) 두 개의 데이터베이스를 만듭니다. Spring `dev`
+프로파일에서 스키마를 매번 새로 만들어도(`ddl-auto=create-drop`) `msps_dev`만 영향받고, 이
+스크립트로 수집한 실제 데이터가 들어있는 `msps_prod`는 안전합니다.
 
 레포 루트에서:
 
@@ -59,9 +59,9 @@ docker compose up -d
 - `docker/init.sql`은 컨테이너를 **처음** 띄울 때 한 번만 실행됩니다. 이미 띄운 적이 있는데
   DB가 새로 안 생겼다면, 볼륨을 지우고 다시 띄워야 합니다: `docker compose down -v && docker
   compose up -d` (기존 데이터도 같이 삭제되니 주의).
-- 이 파이썬 스크립트(`load.py`)는 항상 `meokse_prod`를 바라봅니다 (`prep/.env`의
-  `DB_NAME=meokse_prod`). Spring `application-dev.yml`은 `meokse_dev`를, `application-prod.yml`은
-  `meokse_prod`를 가리키도록 설정하면 됩니다. 호스트/포트(`localhost:3306`)는 두 프로파일 다
+- 이 파이썬 스크립트(`load.py`)는 항상 `msps_prod`를 바라봅니다 (`prep/.env`의
+  `DB_NAME=msps_prod`). Spring `application-dev.yml`은 `msps_dev`를, `application-prod.yml`은
+  `msps_prod`를 가리키도록 설정하면 됩니다. 호스트/포트(`localhost:3306`)는 두 프로파일 다
   동일합니다.
 - 컨테이너 로그 확인: `docker compose logs -f mysql` / 중지: `docker compose down` (볼륨은 유지되어
   데이터가 남아있습니다).
