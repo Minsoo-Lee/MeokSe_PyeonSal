@@ -16,13 +16,13 @@ PROCESSED_VIDEOS_FILE = DATA_DIR / "processed_videos.json"
 
 PLAYLIST_URL = os.getenv("PLAYLIST_URL", "")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
 
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = int(os.getenv("DB_PORT", "3306"))
 DB_USER = os.getenv("DB_USER", "root")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "")
-DB_NAME = os.getenv("DB_NAME", "meokse")
+DB_NAME = os.getenv("DB_NAME", "msps")
 
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 EXTRACTED_DIR.mkdir(parents=True, exist_ok=True)
