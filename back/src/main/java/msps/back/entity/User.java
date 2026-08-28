@@ -6,6 +6,7 @@ import lombok.ToString;
 import java.time.Instant;
 
 @Entity
+@Table(name = "users")
 public class User {
 
     @Id
