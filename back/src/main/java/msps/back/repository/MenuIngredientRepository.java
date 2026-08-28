@@ -23,4 +23,10 @@ public interface MenuIngredientRepository extends JpaRepository<MenuIngredient, 
             "join fetch mi.ingredient " +
             "where mi.menu.id = :id")
     List<MenuIngredient> findMenuIngredientsByMenuId(Long id);
+
+    @Query("select mi " +
+            "from MenuIngredient mi " +
+            "join fetch mi.menu " +
+            "join fetch mi.ingredient")
+    List<MenuIngredient> findAllWithMenuAndIngredient();
 }

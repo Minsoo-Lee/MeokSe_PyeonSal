@@ -2,10 +2,12 @@ package msps.back.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.ToString;
 
 @Entity
 @Getter
 @Table(name = "menu_ingredient")
+@ToString
 public class MenuIngredient {
 
     @Id
@@ -27,6 +29,5 @@ public class MenuIngredient {
 
     private Long amountValue;
     private String amountUnit;
-
     private String amountText;
 }

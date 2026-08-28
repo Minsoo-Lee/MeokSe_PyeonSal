@@ -2,6 +2,7 @@ package msps.back.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import msps.back.dto.response.AllMenuIngredientsGetResponse;
 import msps.back.dto.response.DailyDetailGetResponse;
 import msps.back.dto.response.DailyGetResponse;
 import msps.back.entity.AmountType;
@@ -14,9 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -80,5 +79,38 @@ public class MenuService {
 
         return new DailyDetailGetResponse(
                 menu.getName(), menu.getDay(), menu.getRecipe(), page, menu.getVideoId(), ingredientInfos);
+    }
+
+    public List<AllMenuIngredientsGetResponse> getAllData() {
+        List<MenuIngredient> allMI = menuIngredientRepository.findAllWithMenuAndIngredient();
+        Map<Long, AllMenuIngredientsGetResponse> allMap = new HashMap<>();
+
+        for (MenuIngredient mi : allMI) {
+            if (!allMap.containsKey(mi.getMenu().getId())) {
+                AllMenuIngredientsGetResponse dto =
+                        new AllMenuIngredientsGetResponse(
+                                mi.getMenu().getId(),
+                                mi.getMenu().getDay(),
+                                mi.getMenu().getName());
+                allMap.put(mi.getMenu().getId(), dto);
+            }
+            AllMenuIngredientsGetResponse response = allMap.get(mi.getMenu().getId());
+            if (!mi.getIngredient().getType().equals("양념")) {
+                response.addIngredientInfo(
+                        new AllMenuIngredientsGetResponse.IngredientInfo(
+                                mi.getIngredient().getId(),
+                                mi.getIngredient().getName(),
+                                mi.getIngredient().getType(),
+                                mi.getAmountType(),
+                                mi.getAmountValue(),
+                                mi.getAmountUnit(),
+                                mi.getAmountText()
+                        )
+                );
+            }
+        }
+        List<AllMenuIngredientsGetResponse> list = allMap.values().stream().toList();
+        log.info("[list] {}", list);
+        return list;
     }
 }
