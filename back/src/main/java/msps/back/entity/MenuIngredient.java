@@ -3,6 +3,7 @@ package msps.back.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.ToString;
+import msps.back.entity.type.AmountType;
 
 @Entity
 @Getter

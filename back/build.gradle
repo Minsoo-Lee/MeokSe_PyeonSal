@@ -28,6 +28,10 @@ dependencies {
     implementation platform('me.paulschwarz:spring-dotenv-bom:5.1.0')
     implementation 'me.paulschwarz:springboot4-dotenv'
 
+    // spring security & auth2
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'

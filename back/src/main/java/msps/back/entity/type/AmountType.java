@@ -1,4 +1,4 @@
-package msps.back.entity;
+package msps.back.entity.type;
 
 public enum AmountType {
     APPROX, EXACT

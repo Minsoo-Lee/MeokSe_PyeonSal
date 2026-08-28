@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import msps.back.dto.response.AllMenuIngredientsGetResponse;
 import msps.back.dto.response.DailyDetailGetResponse;
 import msps.back.dto.response.DailyGetResponse;
-import msps.back.entity.AmountType;
+import msps.back.entity.type.AmountType;
 import msps.back.entity.Menu;
 import msps.back.entity.MenuIngredient;
 import msps.back.repository.MenuIngredientRepository;
