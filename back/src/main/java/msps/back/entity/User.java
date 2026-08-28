@@ -3,6 +3,7 @@ package msps.back.entity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import msps.back.entity.base.TimeBaseEntity;
 
 @Entity
@@ -22,6 +23,9 @@ public class User extends TimeBaseEntity {
     // OAuth2 정보들
     private String provider;
     private String providerId;
+
+    @Setter
+    private boolean nicknameSet;
 
     //== Constructor ==//
     public User() { }

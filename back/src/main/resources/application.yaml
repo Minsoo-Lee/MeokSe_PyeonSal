@@ -29,3 +29,7 @@ server:
 app:
   auth:
     allowed-emails: ${ALLOWED_EMAILS}
+
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-ms: 2592000000  # 30일

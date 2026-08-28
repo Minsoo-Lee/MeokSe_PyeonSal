@@ -3,7 +3,9 @@ package msps.back.auth;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import msps.back.service.JwtService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -13,10 +15,12 @@ import java.io.IOException;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     @Value("${app.frontend-origin:http://localhost:3000}")
     private String frontendOrigin;
+    private final JwtService jwtService;
 
     @Override
     public void onAuthenticationSuccess(
@@ -26,6 +30,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         CustomOAuth2User principal = (CustomOAuth2User) authentication.getPrincipal();
         log.info("[로그인 성공] userId = {}", principal.getUserId());
 
-        response.sendRedirect(frontendOrigin);
+        String token = jwtService.generateToken(principal.getUserId());
+        response.sendRedirect(frontendOrigin + "/oauth/callback#token=" + token);
     }
 }
