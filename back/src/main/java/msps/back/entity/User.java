@@ -37,4 +37,10 @@ public class User extends TimeBaseEntity {
         this.provider = provider;
         this.providerId = providerId;
     }
+
+    //== 연관관계 메서드 ==//
+    public void completeSignup(String name) {
+        this.name = name;
+        this.nicknameSet = true;
+    }
 }
