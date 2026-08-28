@@ -83,10 +83,21 @@ def main() -> None:
                     skipped.append(title)
                     continue
 
-                menu_sql = "INSERT INTO menu (day, recipe) VALUES (%s, %s)"
-                menu_params = (day, record.get("recipe", ""))
+                menu_sql = (
+                    "INSERT INTO menu (menu_id, day, name, recipe, video_id) "
+                    "VALUES (%s, %s, %s, %s, %s)"
+                )
+                menu_params = (
+                    day,
+                    day,
+                    record.get("menu_name", ""),
+                    record.get("recipe", ""),
+                    record.get("video_id", ""),
+                )
                 cursor.execute(menu_sql, menu_params)
-                menu_id = cursor.lastrowid
+                # menu_id를 day와 동일하게 명시적으로 넣었으므로, auto-increment가 실제로
+                # 채번하지 않아 lastrowid는 신뢰할 수 없다. day를 그대로 사용한다.
+                menu_id = day
                 sql_statements.append(cursor.mogrify(menu_sql, menu_params) + ";")
                 inserted_menus += 1
 

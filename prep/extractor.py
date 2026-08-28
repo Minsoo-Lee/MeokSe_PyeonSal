@@ -41,7 +41,8 @@ RESPONSE_SCHEMA = {
         "menu_name": {"type": "STRING"},
         "recipe": {
             "type": "STRING",
-            "description": "조리 순서/레시피 본문. 설명란에 있는 그대로 정리",
+            "description": "조리 순서/레시피 본문. 설명란에 있는 그대로 정리. "
+            "각 조리 단계는 줄바꿈 문자(\\n)로 구분",
         },
         "ingredients": {
             "type": "ARRAY",
@@ -98,6 +99,8 @@ PROMPT_TEMPLATE = """\
 - day는 제목이나 설명에 "N일차", "Day N" 같은 표현이 있으면 그 숫자를 쓰고, 못 찾으면 null로 둬.
   추측하지 마.
 - 재료가 하나도 안 보이면 ingredients를 빈 배열로 둬.
+- recipe는 "1. ... 2. ... 3. ..." 처럼 번호를 매기고, 각 번호 단계 사이는 반드시
+  줄바꿈 문자(\n)로 구분해. 한 줄로 이어 붙이지 마.
 
 [제목]
 {title}

@@ -20,15 +20,17 @@ DELIMITER $$
 CREATE PROCEDURE msps_create_schema(IN target_db VARCHAR(64))
 BEGIN
     SET @create_menu = CONCAT('CREATE TABLE IF NOT EXISTS `', target_db, '`.`menu` (
-        `menu_id` INT AUTO_INCREMENT PRIMARY KEY,
+        `menu_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
         `day` INT NOT NULL,
+        `name` VARCHAR(255),
         `recipe` TEXT,
+        `video_id` VARCHAR(20) NOT NULL,
         UNIQUE KEY `uk_menu_day` (`day`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
     PREPARE stmt FROM @create_menu; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
     SET @create_ingredient = CONCAT('CREATE TABLE IF NOT EXISTS `', target_db, '`.`ingredient` (
-        `ingredient_id` INT AUTO_INCREMENT PRIMARY KEY,
+        `ingredient_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
         `name` VARCHAR(255) NOT NULL,
         `type` VARCHAR(255),
         UNIQUE KEY `uk_ingredient_name` (`name`)
@@ -36,9 +38,9 @@ BEGIN
     PREPARE stmt FROM @create_ingredient; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
     SET @create_menu_ingredient = CONCAT('CREATE TABLE IF NOT EXISTS `', target_db, '`.`menu_ingredient` (
-        `menu_ingredient_id` INT AUTO_INCREMENT PRIMARY KEY,
-        `menu_id` INT NOT NULL,
-        `ingredient_id` INT NOT NULL,
+        `menu_ingredient_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+        `menu_id` BIGINT NOT NULL,
+        `ingredient_id` BIGINT NOT NULL,
         `amount_type` ENUM(''EXACT'', ''APPROX'') NOT NULL,
         `amount_value` INT NULL,
         `amount_unit` VARCHAR(20) NULL,
