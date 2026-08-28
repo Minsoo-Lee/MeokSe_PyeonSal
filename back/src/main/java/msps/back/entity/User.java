@@ -1,13 +1,14 @@
 package msps.back.entity;
 
 import jakarta.persistence.*;
-import lombok.ToString;
-
-import java.time.Instant;
+import lombok.Builder;
+import lombok.Getter;
+import msps.back.entity.base.TimeBaseEntity;
 
 @Entity
+@Getter
 @Table(name = "users")
-public class User {
+public class User extends TimeBaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,7 +17,20 @@ public class User {
 
     private String name;
 
+    private String email;
+
     // OAuth2 정보들
     private String provider;
     private String providerId;
+
+    //== Constructor ==//
+    public User() { }
+
+    @Builder
+    public User(String name, String email, String provider, String providerId) {
+        this.name = name;
+        this.email = email;
+        this.provider = provider;
+        this.providerId = providerId;
+    }
 }
