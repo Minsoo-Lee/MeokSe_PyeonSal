@@ -29,15 +29,18 @@ public class MenuController {
 
     @GetMapping("/{id}")
     public DailyDetailGetResponse getDailyMenuDetail(
-            @PathVariable Long id
+            @PathVariable Long id,
+            @AuthenticationPrincipal User user
     ) {
-        return menuService.getMenuDetail(id);
+        return menuService.getMenuDetail(id, user.getId());
     }
 
     @GetMapping("/ingredients")
-    public List<AllMenuIngredientsGetResponse> getAllMenuIngredients() {
+    public List<AllMenuIngredientsGetResponse> getAllMenuIngredients(
+            @AuthenticationPrincipal User user
+    ) {
         log.info("[getAllMenuIngredients]");
-        return menuService.getAllData();
+        return menuService.getAllData(user.getId());
     }
 
     @PostMapping("/{id}/check")

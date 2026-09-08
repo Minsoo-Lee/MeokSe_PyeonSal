@@ -67,10 +67,10 @@ public class MenuService {
         return new DailyGetResponse(menuInfos, (int) menuPage.getTotalElements());
     }
 
-    public DailyDetailGetResponse getMenuDetail(Long id) {
+    public DailyDetailGetResponse getMenuDetail(Long userId, Long menuId) {
         // IngredientInfo 구하기
         List<MenuIngredient> menuIngredients =
-                menuIngredientRepository.findMenuIngredientsByMenuId(id);
+                menuIngredientRepository.findMenuIngredientsByMenuId(menuId);
 
         List<DailyDetailGetResponse.IngredientInfo> ingredientInfos =
                 menuIngredients.stream()
@@ -83,26 +83,49 @@ public class MenuService {
                         )).toList();
 
         // page 구하기
-        Menu menu = menuRepository.findById(id).orElseThrow(RuntimeException::new);
+        Menu menu = menuRepository.findById(menuId).orElseThrow(RuntimeException::new);
         int count = menuRepository.countByDayLessThan(menu.getDay());
         int page = (count / PAGE_SIZE) + 1;
 
+        // favorite, check 상태 구하기
+        boolean checked = checkRepository.findByUserIdAndMenuId(userId, menuId).isPresent();
+        boolean favorite = favoriteRepository.findByUserIdAndMenuId(userId, menuId).isPresent();
+
         return new DailyDetailGetResponse(
-                menu.getName(), menu.getDay(), menu.getRecipe(), page, menu.getVideoId(), ingredientInfos);
+                menu.getName(),
+                menu.getDay(),
+                menu.getRecipe(),
+                page,
+                menu.getVideoId(),
+                checked,
+                favorite,
+                ingredientInfos);
     }
 
-    public List<AllMenuIngredientsGetResponse> getAllData() {
+    public List<AllMenuIngredientsGetResponse> getAllData(Long userId) {
         List<MenuIngredient> allMI = menuIngredientRepository.findAllWithMenuAndIngredient();
+
+        List<Long> menuIds = allMI.stream()
+                .map(mi -> mi.getMenu().getId())
+                .distinct()
+                .toList();
+
+        Set<Long> checkedMenuIds =
+                new HashSet<>(checkRepository.findMenuIdsByUserIdAndMenuIdIn(userId, menuIds));
+
         Map<Long, AllMenuIngredientsGetResponse> allMap = new HashMap<>();
 
         for (MenuIngredient mi : allMI) {
-            if (!allMap.containsKey(mi.getMenu().getId())) {
+            Long menuId = mi.getMenu().getId();
+            if (!allMap.containsKey(menuId)) {
                 AllMenuIngredientsGetResponse dto =
                         new AllMenuIngredientsGetResponse(
-                                mi.getMenu().getId(),
+                                menuId,
                                 mi.getMenu().getDay(),
-                                mi.getMenu().getName());
-                allMap.put(mi.getMenu().getId(), dto);
+                                mi.getMenu().getName(),
+                                checkedMenuIds.contains(menuId)
+                                );
+                allMap.put(menuId, dto);
             }
             AllMenuIngredientsGetResponse response = allMap.get(mi.getMenu().getId());
             if (!mi.getIngredient().getType().equals("양념")) {

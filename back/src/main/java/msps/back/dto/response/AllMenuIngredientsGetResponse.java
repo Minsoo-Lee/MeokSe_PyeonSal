@@ -17,12 +17,14 @@ public class AllMenuIngredientsGetResponse {
     private Long menuId;
     private int day;
     private String name;
+    private boolean checked;
     private List<IngredientInfo> ingredientInfos =  new ArrayList<>();
 
-    public AllMenuIngredientsGetResponse(Long menuId, int day, String name) {
+    public AllMenuIngredientsGetResponse(Long menuId, int day, String name, boolean checked) {
         this.menuId = menuId;
         this.day = day;
         this.name = name;
+        this.checked = checked;
     }
 
     public void addIngredientInfo (IngredientInfo info) {

@@ -8,6 +8,8 @@ public record DailyDetailGetResponse(
         String recipe,
         int page,
         String videoId,
+        boolean checked,
+        boolean favorite,
         List<IngredientInfo> ingredientInfos
 ) {
     public record IngredientInfo(
