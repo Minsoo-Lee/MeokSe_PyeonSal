@@ -2,14 +2,13 @@ package msps.back.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import msps.back.dto.response.AddCheckResponse;
-import msps.back.dto.response.AddFavoriteResponse;
-import msps.back.dto.response.DailyDetailGetResponse;
-import msps.back.dto.response.DailyGetResponse;
+import msps.back.dto.response.*;
 import msps.back.entity.User;
 import msps.back.service.MenuService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -33,6 +32,11 @@ public class MenuController {
             @PathVariable Long id
     ) {
         return menuService.getMenuDetail(id);
+    }
+
+    @GetMapping("/ingredients")
+    public List<AllMenuIngredientsGetResponse> getAllMenuIngredients() {
+        return menuService.getAllData();
     }
 
     @PostMapping("/{id}/check")
