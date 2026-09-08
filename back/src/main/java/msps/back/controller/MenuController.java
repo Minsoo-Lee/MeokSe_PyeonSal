@@ -58,4 +58,12 @@ public class MenuController {
         boolean favorite = menuService.addFavorite(id, user.getId());
         return new AddFavoriteResponse(favorite);
     }
+
+    @GetMapping("/favorites")
+    public FavoritesGetResponse getFavorites(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "8") int limit,
+            @AuthenticationPrincipal User user) {
+        return menuService.getFavoriteMenuInfos(page, limit, user.getId());
+    }
 }

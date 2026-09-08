@@ -5,12 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import msps.back.dto.response.AllMenuIngredientsGetResponse;
 import msps.back.dto.response.DailyDetailGetResponse;
 import msps.back.dto.response.DailyGetResponse;
+import msps.back.dto.response.FavoritesGetResponse;
 import msps.back.entity.Check;
 import msps.back.entity.Favorite;
 import msps.back.entity.type.AmountType;
 import msps.back.entity.Menu;
 import msps.back.entity.MenuIngredient;
 import msps.back.repository.*;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -41,17 +43,12 @@ public class MenuService {
         List<MenuIngredient> ingredients =
                 menuIngredientRepository.findByMenuIdsWithIngredient(menuIds);
 
+        Map<Long, List<String>> ingredientNamesByMenuId = getIngredientNamesByMenuId(ingredients);
+
         Set<Long> checks = new HashSet<>(checkRepository.findMenuIdsByUserIdAndMenuIdIn(userId, menuIds));
         Set<Long> favorites = new HashSet<>(favoriteRepository.findMenuIdsByUserIdAndMenuIdIn(userId, menuIds));
 
 
-        // menu_id별로 묶고, 양념 제외하고, 이름만 뽑기
-        Map<Long, List<String>> ingredientNamesByMenuId = ingredients.stream()
-                .filter(mi -> !"양념".equals(mi.getIngredient().getType()))
-                .collect(Collectors.groupingBy(
-                        mi -> mi.getMenu().getId(),
-                        Collectors.mapping(mi -> mi.getIngredient().getName(), Collectors.toList())
-                ));
 
         List<DailyGetResponse.MenuInfo> menuInfos = menus.stream()
                 .map(menu -> new DailyGetResponse.MenuInfo(
@@ -59,12 +56,23 @@ public class MenuService {
                         menu.getDay(),
                         menu.getName(),
                         ingredientNamesByMenuId.getOrDefault(menu.getId(), List.of()),
-                        favorites.contains(menu.getId()),
-                        checks.contains(menu.getId())
+                        checks.contains(menu.getId()),
+                        favorites.contains(menu.getId())
                 ))
                 .toList();
 
         return new DailyGetResponse(menuInfos, (int) menuPage.getTotalElements());
+    }
+
+    private static @NonNull Map<Long, List<String>> getIngredientNamesByMenuId(List<MenuIngredient> ingredients) {
+        // menu_id별로 묶고, 양념 제외하고, 이름만 뽑기
+        Map<Long, List<String>> ingredientNamesByMenuId = ingredients.stream()
+                .filter(mi -> !"양념".equals(mi.getIngredient().getType()))
+                .collect(Collectors.groupingBy(
+                        mi -> mi.getMenu().getId(),
+                        Collectors.mapping(mi -> mi.getIngredient().getName(), Collectors.toList())
+                ));
+        return ingredientNamesByMenuId;
     }
 
     public DailyDetailGetResponse getMenuDetail(Long userId, Long menuId) {
@@ -181,5 +189,31 @@ public class MenuService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public FavoritesGetResponse getFavoriteMenuInfos(int page, int limit, Long userId) {
+        Pageable pageable = PageRequest.of(page - 1, limit);
+        Page<Menu> menuPage = favoriteRepository.findFavoriteMenusByUserId(userId, pageable);
+
+        List<Menu> menus = menuPage.getContent();
+        List<Long> menuIds = menus.stream().map(Menu::getId).toList();
+        List<MenuIngredient> ingredients =
+                menuIngredientRepository.findByMenuIdsWithIngredient(menuIds);
+
+        Map<Long, List<String>> ingredientNamesByMenuId = getIngredientNamesByMenuId(ingredients);
+
+        Set<Long> favorites = new HashSet<>(favoriteRepository.findMenuIdsByUserIdAndMenuIdIn(userId, menuIds));
+
+        List<FavoritesGetResponse.MenuInfo> menuInfos = menus.stream()
+                .map(menu -> new FavoritesGetResponse.MenuInfo(
+                        menu.getId(),
+                        menu.getDay(),
+                        menu.getName(),
+                        ingredientNamesByMenuId.getOrDefault(menu.getId(), List.of()),
+                        true
+                ))
+                .toList();
+
+        return new FavoritesGetResponse(menuInfos, (int) menuPage.getTotalElements());
     }
 }
