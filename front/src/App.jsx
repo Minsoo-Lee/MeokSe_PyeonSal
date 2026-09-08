@@ -1,12 +1,15 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
+import RequireAuth from './components/RequireAuth'
 import Layout from './components/Layout'
 import LoginPage from './pages/LoginPage'
 import ErrorPage from './pages/ErrorPage'
 import OAuthCallbackPage from './pages/OAuthCallbackPage'
+import UserSignupPage from './pages/UserSignupPage'
 import MenuListPage from './pages/MenuListPage'
 import MenuDetailPage from './pages/MenuDetailPage'
 import IngredientCheckPage from './pages/IngredientCheckPage'
+import FavoritesPage from './pages/FavoritesPage'
 
 export default function App() {
   return (
@@ -17,16 +20,16 @@ export default function App() {
           <Route path="/error" element={<ErrorPage />} />
           <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
 
-          {/*
-            TODO: 백엔드에 JWT 발급 붙이면 아래 Route를 <Route element={<RequireAuth />}>로
-            한 번 더 감싸기. 지금은 OAuth2SuccessHandler가 토큰 없이 그냥 "/"로만 리다이렉트하는
-            임시 버전이라, RequireAuth를 씌워두면 로그인에 성공해도 토큰이 없어서 다시 /login으로
-            튕겨나가 버림.
-          */}
-          <Route element={<Layout />}>
-            <Route path="/" element={<MenuListPage />} />
-            <Route path="/menu/:menuId" element={<MenuDetailPage />} />
-            <Route path="/ingredients" element={<IngredientCheckPage />} />
+          <Route element={<RequireAuth />}>
+            {/* Layout(상단 네비) 없이 단독으로 보여주는 화면 - 온보딩 단계라 메인 네비가 아직 안 어울림 */}
+            <Route path="/user/signup" element={<UserSignupPage />} />
+
+            <Route element={<Layout />}>
+              <Route path="/" element={<MenuListPage />} />
+              <Route path="/menu/:menuId" element={<MenuDetailPage />} />
+              <Route path="/ingredients" element={<IngredientCheckPage />} />
+              <Route path="/favorites" element={<FavoritesPage />} />
+            </Route>
           </Route>
         </Routes>
       </BrowserRouter>

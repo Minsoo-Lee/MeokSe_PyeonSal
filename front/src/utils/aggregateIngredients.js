@@ -1,7 +1,7 @@
 /**
  * 선택된 일차들(selectedDays)에 해당하는 메뉴들의 재료를 재료 단위로 묶어서 반환합니다.
  *
- * menuInfos: GET /ingredients/check 응답의 menuInfos 그대로 (각 항목에 day, name,
+ * menuInfos: GET /menu/ingredients 응답의 menuInfos 그대로 (각 항목에 day, name,
  * ingredientInfos가 들어있음). 재료가 어느 메뉴 것인지는 이 중첩 구조로 구분합니다.
  *
  * 같은 재료가 여러 날 동일한 양(같은 amountType/Value/Unit/Text)으로 등장하면 한 줄로 합치고,

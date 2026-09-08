@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { fetchDailyMenus } from '../api/menu'
+import { fetchDailyMenus, toggleChecked, toggleFavorite } from '../api/menu'
 import { getMainIngredientSummary } from '../utils/mainIngredientSummary'
+import { CheckBadge, FavoriteBadge } from '../components/RecipeBadgeButtons'
 
 const PAGE_SIZE = 8
 
@@ -40,6 +41,48 @@ export default function MenuListPage() {
     setSearchParams(nextPage === 1 ? {} : { page: String(nextPage) })
   }
 
+  // 즐겨찾기/체크는 카드 클릭(상세 이동)과 겹치는 영역에 있어서, 먼저 로컬 상태를
+  // 낙관적으로 뒤집어 반응성을 준다. 응답이 오면 서버가 돌려준 실제 값으로 다시
+  // 맞춰서(단순 재반전이 아니라 덮어쓰기) 다른 기기에서 동시에 눌렀을 때도 서버
+  // 기준으로 수렴하게 하고, 실패하면 원래대로 되돌린다.
+  function handleToggleFavorite(e, menuId) {
+    e.preventDefault()
+    e.stopPropagation()
+    setMenus((prev) =>
+      prev.map((m) => (m.menuId === menuId ? { ...m, favorite: !m.favorite } : m))
+    )
+    toggleFavorite(menuId)
+      .then(({ favorite }) => {
+        setMenus((prev) =>
+          prev.map((m) => (m.menuId === menuId ? { ...m, favorite } : m))
+        )
+      })
+      .catch(() => {
+        setMenus((prev) =>
+          prev.map((m) => (m.menuId === menuId ? { ...m, favorite: !m.favorite } : m))
+        )
+      })
+  }
+
+  function handleToggleChecked(e, menuId) {
+    e.preventDefault()
+    e.stopPropagation()
+    setMenus((prev) =>
+      prev.map((m) => (m.menuId === menuId ? { ...m, checked: !m.checked } : m))
+    )
+    toggleChecked(menuId)
+      .then(({ checked }) => {
+        setMenus((prev) =>
+          prev.map((m) => (m.menuId === menuId ? { ...m, checked } : m))
+        )
+      })
+      .catch(() => {
+        setMenus((prev) =>
+          prev.map((m) => (m.menuId === menuId ? { ...m, checked: !m.checked } : m))
+        )
+      })
+  }
+
   return (
     <section>
       <div className="mb-6">
@@ -68,6 +111,16 @@ export default function MenuListPage() {
                     <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700">
                       {menu.day}일차
                     </span>
+                    <div className="flex items-center gap-2">
+                      <CheckBadge
+                        checked={!!menu.checked}
+                        onToggle={(e) => handleToggleChecked(e, menu.menuId)}
+                      />
+                      <FavoriteBadge
+                        favorite={!!menu.favorite}
+                        onToggle={(e) => handleToggleFavorite(e, menu.menuId)}
+                      />
+                    </div>
                   </div>
                   <p className="mt-3 text-lg font-semibold text-stone-900">{menu.name}</p>
                   <p className="mt-1 text-sm text-stone-500">

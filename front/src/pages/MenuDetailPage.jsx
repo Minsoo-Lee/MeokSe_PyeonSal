@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { fetchMenuDetail } from '../api/menu'
+import { fetchMenuDetail, toggleChecked, toggleFavorite } from '../api/menu'
+import { CheckBadge, FavoriteBadge } from '../components/RecipeBadgeButtons'
 
 export default function MenuDetailPage() {
   const { menuId } = useParams()
@@ -27,6 +28,30 @@ export default function MenuDetailPage() {
       ignore = true
     }
   }, [menuId])
+
+  // 목록 페이지와 동일하게 낙관적 업데이트 후, 응답이 오면 서버가 돌려준 실제 값으로
+  // 덮어쓰고, 실패하면 롤백.
+  function handleToggleFavorite() {
+    setMenu((prev) => (prev ? { ...prev, favorite: !prev.favorite } : prev))
+    toggleFavorite(menuId)
+      .then(({ favorite }) => {
+        setMenu((prev) => (prev ? { ...prev, favorite } : prev))
+      })
+      .catch(() => {
+        setMenu((prev) => (prev ? { ...prev, favorite: !prev.favorite } : prev))
+      })
+  }
+
+  function handleToggleChecked() {
+    setMenu((prev) => (prev ? { ...prev, checked: !prev.checked } : prev))
+    toggleChecked(menuId)
+      .then(({ checked }) => {
+        setMenu((prev) => (prev ? { ...prev, checked } : prev))
+      })
+      .catch(() => {
+        setMenu((prev) => (prev ? { ...prev, checked: !prev.checked } : prev))
+      })
+  }
 
   if (status === 'loading') {
     return (
@@ -62,9 +87,15 @@ export default function MenuDetailPage() {
       </Link>
 
       <div className="mb-5">
-        <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700">
-          {menu.day}일차
-        </span>
+        <div className="flex items-center justify-between">
+          <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700">
+            {menu.day}일차
+          </span>
+          <div className="flex items-center gap-2">
+            <CheckBadge checked={!!menu.checked} onToggle={handleToggleChecked} />
+            <FavoriteBadge favorite={!!menu.favorite} onToggle={handleToggleFavorite} />
+          </div>
+        </div>
         <h1 className="mt-5 text-2xl font-bold text-stone-900">{menu.name}</h1>
       </div>
 

@@ -57,8 +57,14 @@ export function AuthProvider({ children }) {
     setUser(null)
   }, [])
 
+  // /user/signup처럼 서버 응답이 user 전체가 아니라 일부(userId 등)만 내려줄 때,
+  // 새로고침 없이 로컬 user 상태만 즉시 갱신하려고 노출해둠 (RequireAuth가 이 값을 보고 분기함).
+  const updateUser = useCallback((partialOrNewUser) => {
+    setUser((prev) => ({ ...prev, ...partialOrNewUser }))
+  }, [])
+
   return (
-    <AuthContext.Provider value={{ token, user, loading, login, logout }}>
+    <AuthContext.Provider value={{ token, user, loading, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   )

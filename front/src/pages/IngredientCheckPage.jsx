@@ -75,7 +75,7 @@ export default function IngredientCheckPage() {
   return (
     <section>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-stone-900">다중 일 재료 확인</h1>
+        <h1 className="text-2xl font-bold text-stone-900">재료 모아보기</h1>
         <p className="mt-1 text-sm text-stone-500">
           카드를 눌러 확인할 날짜를 골라보세요. 이어서 다른 카드를 누르면 그 사이 구간이 한 번에 선택돼요.
         </p>
@@ -127,13 +127,23 @@ export default function IngredientCheckPage() {
                           : 'border-stone-200 bg-white hover:border-orange-200'
                       }`}
                     >
-                      <span
-                        className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${
-                          isSelected ? 'bg-orange-200 text-orange-800' : 'bg-orange-100 text-orange-700'
-                        }`}
-                      >
-                        {menu.day}일차
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${
+                            isSelected ? 'bg-orange-200 text-orange-800' : 'bg-orange-100 text-orange-700'
+                          }`}
+                        >
+                          {menu.day}일차
+                        </span>
+                        {menu.checked && (
+                          <span
+                            title="이미 만들어본 메뉴예요"
+                            className="inline-flex items-center gap-0.5 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700"
+                          >
+                            ✓ 완료
+                          </span>
+                        )}
+                      </div>
                       <p className="mt-1 truncate text-sm font-medium text-stone-900">{menu.name}</p>
                     </button>
                   </li>

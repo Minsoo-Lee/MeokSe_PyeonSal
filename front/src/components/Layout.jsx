@@ -27,6 +27,9 @@ export default function Layout() {
             <NavLink to="/ingredients" className={navLinkClass}>
               재료 확인
             </NavLink>
+            <NavLink to="/favorites" className={navLinkClass}>
+              즐겨찾기
+            </NavLink>
 
             {user && (
               <div className="ml-2 flex items-center gap-2 border-l border-stone-200 pl-3">
