@@ -59,8 +59,8 @@ public class MenuService {
                         menu.getDay(),
                         menu.getName(),
                         ingredientNamesByMenuId.getOrDefault(menu.getId(), List.of()),
-                        checks.contains(menu.getId()),
-                        favorites.contains(menu.getId())
+                        favorites.contains(menu.getId()),
+                        checks.contains(menu.getId())
                 ))
                 .toList();
 
@@ -126,6 +126,11 @@ public class MenuService {
 
     public boolean addCheck(Long menuId, Long userId) {
         try {
+            Optional<Check> existing = checkRepository.findByUserIdAndMenuId(userId, menuId);
+            if (existing.isPresent()) {
+                checkRepository.delete(existing.get());
+                return false;
+            }
             Check check = Check.builder()
                     .menu(menuRepository.getReferenceById(menuId))
                     .user(userRepository.getReferenceById(userId))
@@ -139,6 +144,11 @@ public class MenuService {
 
     public boolean addFavorite(Long menuId, Long userId) {
         try {
+            Optional<Favorite> existing = favoriteRepository.findByUserIdAndMenuId(userId, menuId);
+            if (existing.isPresent()) {
+                favoriteRepository.delete(existing.get());
+                return false;
+            }
             Favorite favorite = Favorite.builder()
                     .menu(menuRepository.getReferenceById(menuId))
                     .user(userRepository.getReferenceById(userId))

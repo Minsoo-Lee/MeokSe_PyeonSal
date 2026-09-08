@@ -17,6 +17,6 @@ spring:
       # resources/data.sql을 앱 켤 때마다 자동 실행 (prep/load.py가 export한 SQL을 복사해서 씀)
       mode: always
 
-logging:
-  level:
-    org.hibernate.SQL: debug
+#logging:
+#  level:
+#    org.hibernate.SQL: debug

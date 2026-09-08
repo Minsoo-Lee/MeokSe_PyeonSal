@@ -36,6 +36,7 @@ public class MenuController {
 
     @GetMapping("/ingredients")
     public List<AllMenuIngredientsGetResponse> getAllMenuIngredients() {
+        log.info("[getAllMenuIngredients]");
         return menuService.getAllData();
     }
 
