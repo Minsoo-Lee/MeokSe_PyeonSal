@@ -29,6 +29,50 @@ BEGIN
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
     PREPARE stmt FROM @create_menu; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
+    -- 'user'는 MySQL 예약어라 테이블명을 'users'로 함
+    SET @create_users = CONCAT('CREATE TABLE IF NOT EXISTS `', target_db, '`.`users` (
+        `user_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+        `name` VARCHAR(255),
+        `email` VARCHAR(255) NOT NULL,
+        `provider` VARCHAR(50) NOT NULL,
+        `provider_id` VARCHAR(255) NOT NULL,
+        `nickname_set` BOOLEAN NOT NULL DEFAULT FALSE,
+        `created_at` DATETIME(6) NULL,
+        `updated_at` DATETIME(6) NULL,
+        `deleted_at` DATETIME(6) NULL,
+        UNIQUE KEY `uk_users_provider_id` (`provider`, `provider_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
+    PREPARE stmt FROM @create_users; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+    -- 즐겨찾기: 행이 존재하면 즐겨찾기한 것, 없으면 아닌 것 (boolean 컬럼 대신 존재 여부로 표현)
+    -- 취소는 하드 삭제라서 TimeBaseEntity(소프트 삭제) 안 쓰고 created_at만 둠
+    SET @create_favorite = CONCAT('CREATE TABLE IF NOT EXISTS `', target_db, '`.`favorite` (
+        `favorite_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+        `user_id` BIGINT NOT NULL,
+        `menu_id` BIGINT NOT NULL,
+        `created_at` DATETIME(6) NULL,
+        UNIQUE KEY `uk_favorite_user_menu` (`user_id`, `menu_id`),
+        CONSTRAINT `fk_fav_user` FOREIGN KEY (`user_id`) REFERENCES `', target_db, '`.`users` (`user_id`)
+            ON DELETE CASCADE,
+        CONSTRAINT `fk_fav_menu` FOREIGN KEY (`menu_id`) REFERENCES `', target_db, '`.`menu` (`menu_id`)
+            ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
+    PREPARE stmt FROM @create_favorite; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+    -- "만들어봤어요" 체크: 사람마다 따로 기록
+    SET @create_checks = CONCAT('CREATE TABLE IF NOT EXISTS `', target_db, '`.`checks` (
+        `checks_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+        `user_id` BIGINT NOT NULL,
+        `menu_id` BIGINT NOT NULL,
+        `created_at` DATETIME(6) NULL,
+        UNIQUE KEY `uk_checked_user_menu` (`user_id`, `menu_id`),
+        CONSTRAINT `fk_chk_user` FOREIGN KEY (`user_id`) REFERENCES `', target_db, '`.`users` (`user_id`)
+            ON DELETE CASCADE,
+        CONSTRAINT `fk_chk_menu` FOREIGN KEY (`menu_id`) REFERENCES `', target_db, '`.`menu` (`menu_id`)
+            ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
+    PREPARE stmt FROM @create_checks; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
     SET @create_ingredient = CONCAT('CREATE TABLE IF NOT EXISTS `', target_db, '`.`ingredient` (
         `ingredient_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
         `name` VARCHAR(255) NOT NULL,
