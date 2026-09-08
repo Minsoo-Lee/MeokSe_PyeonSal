@@ -8,17 +8,13 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 @Getter
 @MappedSuperclass
-public class TimeBaseEntity extends CreatedTimeBaseEntity {
+@EntityListeners(AuditingEntityListener.class)
+public class CreatedTimeBaseEntity {
 
-    protected Instant deletedAt;
-
-    protected Instant updatedAt;
-
-    public void softDelete() {
-        this.deletedAt = Instant.now().truncatedTo(ChronoUnit.SECONDS);
-    }
+    @CreatedDate
+    @Column(updatable = false)
+    protected Instant createdAt;
 }

@@ -7,7 +7,7 @@ spring:
   jpa:
     hibernate:
       # 앱 켤 때마다 스키마를 지웠다 다시 만듦 -> msps_dev만 영향받음 (msps_prod는 안전)
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: false
     properties:
       hibernate:
