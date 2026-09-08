@@ -8,7 +8,9 @@ public record DailyGetResponse(List<MenuInfo> menuInfos, int totalCount) {
             Long menuId,
             int day,
             String name,
-            List<String> ingredientNames
+            List<String> ingredientNames,
+            boolean favorite,
+            boolean checked
     ) {}
 }
 

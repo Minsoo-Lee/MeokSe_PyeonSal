@@ -5,11 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import msps.back.dto.response.AllMenuIngredientsGetResponse;
 import msps.back.dto.response.DailyDetailGetResponse;
 import msps.back.dto.response.DailyGetResponse;
+import msps.back.entity.Check;
+import msps.back.entity.Favorite;
 import msps.back.entity.type.AmountType;
 import msps.back.entity.Menu;
 import msps.back.entity.MenuIngredient;
-import msps.back.repository.MenuIngredientRepository;
-import msps.back.repository.MenuRepository;
+import msps.back.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,8 +28,11 @@ public class MenuService {
 
     private final MenuRepository menuRepository;
     private final MenuIngredientRepository menuIngredientRepository;
+    private final CheckRepository checkRepository;
+    private final FavoriteRepository favoriteRepository;
+    private final UserRepository userRepository;
 
-    public DailyGetResponse getMenuInfos(int page, int limit) {
+    public DailyGetResponse getMenuInfos(int page, int limit, Long userId) {
         Pageable pageable = PageRequest.of(page - 1, limit);
         Page<Menu> menuPage = menuRepository.findAllByOrderByDayAsc(pageable);
 
@@ -36,6 +40,10 @@ public class MenuService {
         List<Long> menuIds = menus.stream().map(Menu::getId).toList();
         List<MenuIngredient> ingredients =
                 menuIngredientRepository.findByMenuIdsWithIngredient(menuIds);
+
+        Set<Long> checks = new HashSet<>(checkRepository.findMenuIdsByUserIdAndMenuIdIn(userId, menuIds));
+        Set<Long> favorites = new HashSet<>(favoriteRepository.findMenuIdsByUserIdAndMenuIdIn(userId, menuIds));
+
 
         // menu_id별로 묶고, 양념 제외하고, 이름만 뽑기
         Map<Long, List<String>> ingredientNamesByMenuId = ingredients.stream()
@@ -50,7 +58,9 @@ public class MenuService {
                         menu.getId(),
                         menu.getDay(),
                         menu.getName(),
-                        ingredientNamesByMenuId.getOrDefault(menu.getId(), List.of())
+                        ingredientNamesByMenuId.getOrDefault(menu.getId(), List.of()),
+                        checks.contains(menu.getId()),
+                        favorites.contains(menu.getId())
                 ))
                 .toList();
 
@@ -112,5 +122,31 @@ public class MenuService {
         List<AllMenuIngredientsGetResponse> list = allMap.values().stream().toList();
         log.info("[list] {}", list);
         return list;
+    }
+
+    public boolean addCheck(Long menuId, Long userId) {
+        try {
+            Check check = Check.builder()
+                    .menu(menuRepository.getReferenceById(menuId))
+                    .user(userRepository.getReferenceById(userId))
+                    .build();
+            checkRepository.save(check);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean addFavorite(Long menuId, Long userId) {
+        try {
+            Favorite favorite = Favorite.builder()
+                    .menu(menuRepository.getReferenceById(menuId))
+                    .user(userRepository.getReferenceById(userId))
+                    .build();
+            favoriteRepository.save(favorite);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
