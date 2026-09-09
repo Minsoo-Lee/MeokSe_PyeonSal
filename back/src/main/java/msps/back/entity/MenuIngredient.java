@@ -28,7 +28,7 @@ public class MenuIngredient {
     @Enumerated(value = EnumType.STRING)
     private AmountType amountType;
 
-    private Integer amountValue;
+    private Double amountValue;
     private String amountUnit;
     private String amountText;
 }

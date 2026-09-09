@@ -39,7 +39,7 @@ public class AllMenuIngredientsGetResponse {
         private String name;
         private String type;
         private AmountType amountType;
-        private Integer amountValue;
+        private Double amountValue;
         private String amountUnit;
         private String amountText;
     }
