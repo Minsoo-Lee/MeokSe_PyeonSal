@@ -11,7 +11,7 @@ DB 스키마(Menu / Ingredient / Menu_Ingredient)에 맞춰 다음 형태로 뽑
       "name": "돼지고기",
       "type": "육류",
       "amount_type": "EXACT",     # EXACT | APPROX
-      "amount_value": 300,        # EXACT일 때만 숫자, APPROX면 null
+      "amount_value": 300,        # EXACT일 때만 숫자(소수 가능, 예: 1.5), APPROX면 null
       "amount_unit": "g",         # EXACT일 때만 단위, APPROX면 null
       "amount_text": null         # APPROX일 때만 원문 표기, EXACT면 null
     },
@@ -56,9 +56,10 @@ RESPONSE_SCHEMA = {
                     },
                     "amount_type": {"type": "STRING", "enum": ["EXACT", "APPROX"]},
                     "amount_value": {
-                        "type": "INTEGER",
+                        "type": "NUMBER",
                         "nullable": True,
-                        "description": "EXACT일 때 숫자 값(단위 제외). APPROX면 null",
+                        "description": "EXACT일 때 숫자 값(단위 제외). 1.5, 0.5처럼 소수도 가능. "
+                        "APPROX면 null",
                     },
                     "amount_unit": {
                         "type": "STRING",
@@ -92,8 +93,8 @@ PROMPT_TEMPLATE = """\
 규칙:
 - amount_type은 "300g", "1개"처럼 구체적인 숫자+단위가 있으면 EXACT, "적당량"/"약간"/"조금" 같이
   모호한 표현이면 APPROX로 분류해.
-- EXACT면 amount_value(숫자)와 amount_unit(단위: g, ml, 개, 큰술, 작은술 등)을 채우고,
-  amount_text는 null로 둬.
+- EXACT면 amount_value(숫자, "1.5개"처럼 소수면 소수 그대로)와 amount_unit(단위: g, ml, 개,
+  큰술, 작은술 등)을 채우고, amount_text는 null로 둬.
 - APPROX면 amount_text에 원문 표현을 그대로(혹은 자연스럽게 다듬어서) 적고,
   amount_value와 amount_unit은 둘 다 null로 둬.
 - day는 제목이나 설명에 "N일차", "Day N" 같은 표현이 있으면 그 숫자를 쓰고, 못 찾으면 null로 둬.

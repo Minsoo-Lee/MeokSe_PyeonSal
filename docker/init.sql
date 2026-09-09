@@ -86,7 +86,7 @@ BEGIN
         `menu_id` BIGINT NOT NULL,
         `ingredient_id` BIGINT NOT NULL,
         `amount_type` ENUM(''EXACT'', ''APPROX'') NOT NULL,
-        `amount_value` INT NULL,
+        `amount_value` DOUBLE NULL,
         `amount_unit` VARCHAR(20) NULL,
         `amount_text` VARCHAR(255) NULL,
         UNIQUE KEY `uk_menu_ingredient` (`menu_id`, `ingredient_id`),
