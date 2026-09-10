@@ -16,7 +16,7 @@ spring:
 
   # 로컬에서 그냥 실행했을 때의 기본값. 배포/실행 시 SPRING_PROFILES_ACTIVE=prod 로 반드시 덮어쓸 것.
   profiles:
-    active: dev
+    active: prod
 
   jpa:
     open-in-view: false
