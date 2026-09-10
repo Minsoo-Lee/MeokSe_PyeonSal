@@ -14,6 +14,7 @@
 
 services:
   frontend:
+    container_name: msps-front
     build:
       context: .
       dockerfile: Dockerfile

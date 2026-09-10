@@ -1,12 +1,13 @@
 services:
-  mysql:
+  db:
     image: mysql:8.4
     container_name: msps-mysql
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "3306:3306"
+    # 외부에서 직접 DB 붙어볼 일 없으면 이 포트 매핑은 생략해도 됨
+    # ports:
+    #   - "3306:3306"
     volumes:
       - msps-mysql-data:/var/lib/mysql
       - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
@@ -17,22 +18,26 @@ services:
       retries: 10
 
   backend:
+    container_name: msps-back
     build:
-      context: ../back
+      context: ./back
       dockerfile: Dockerfile
     environment:
       SPRING_PROFILES_ACTIVE: prod
       DB_HOST: db
       DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: ${DB_PASSWORD}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       JWT_SECRET: ${JWT_SECRET}
       ALLOWED_EMAILS: ${ALLOWED_EMAILS}
       FRONTEND_BASE_URL: ${FRONTEND_BASE_URL}
     ports:
-      - "8080:8080"
+      - "8082:8082"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     restart: unless-stopped
 
 volumes:
