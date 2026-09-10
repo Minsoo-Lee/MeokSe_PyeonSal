@@ -100,8 +100,10 @@ public class MenuService {
         Menu nextMenu = menuRepository.findFirstByDayGreaterThanOrderByDayAsc(menu.getDay()).orElse(null);
         Long prevMenuId = prevMenu != null ? prevMenu.getId() : null;
         Integer prevDay = prevMenu != null ? prevMenu.getDay() : null;
+        String prevName = prevMenu != null ? prevMenu.getName() : null;
         Long nextMenuId = nextMenu != null ? nextMenu.getId() : null;
         Integer nextDay = nextMenu != null ? nextMenu.getDay() : null;
+        String nextName = nextMenu != null ? nextMenu.getName() : null;
 
         // favorite, check 상태 구하기
         boolean checked = checkRepository.findByUserIdAndMenuId(userId, menuId).isPresent();
@@ -118,8 +120,10 @@ public class MenuService {
                 ingredientInfos,
                 prevMenuId,
                 prevDay,
+                prevName,
                 nextMenuId,
-                nextDay);
+                nextDay,
+                nextName);
     }
 
     private String formatAmountValue(double value) {

@@ -13,8 +13,10 @@ public record DailyDetailGetResponse(
         List<IngredientInfo> ingredientInfos,
         Long prevMenuId,
         Integer prevDay,
+        String prevName,
         Long nextMenuId,
-        Integer nextDay
+        Integer nextDay,
+        String nextName
 ) {
     public record IngredientInfo(
             String name,
