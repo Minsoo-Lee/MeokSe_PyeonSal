@@ -16,5 +16,24 @@ services:
       timeout: 5s
       retries: 10
 
+  backend:
+    build:
+      context: ../back
+      dockerfile: Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: db
+      DB_PORT: 3306
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      JWT_SECRET: ${JWT_SECRET}
+      ALLOWED_EMAILS: ${ALLOWED_EMAILS}
+      FRONTEND_BASE_URL: ${FRONTEND_BASE_URL}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    restart: unless-stopped
+
 volumes:
   msps-mysql-data:
