@@ -27,7 +27,7 @@ import config
 
 
 def get_connection():
-    return pymysql.connect(
+    conn = pymysql.connect(
         host=config.DB_HOST,
         port=config.DB_PORT,
         user=config.DB_USER,
@@ -36,6 +36,16 @@ def get_connection():
         charset="utf8mb4",
         autocommit=False,
     )
+    # menu_id를 day와 동일하게 명시적으로 넣는데, day=0인 메뉴(예: "0일차")가 있을 수 있다.
+    # MySQL은 AUTO_INCREMENT 컬럼에 0을 명시적으로 넣으면 기본적으로 NULL과 똑같이 취급해서
+    # "새로 자동 채번"해버린다 (NO_AUTO_VALUE_ON_ZERO가 세션에 안 걸려 있으면). 그러면 실제
+    # 저장된 menu_id는 0이 아닌 다른 값이 되는데, 아래 코드는 menu_id 변수를 여전히
+    # day(=0)로 쓰고 있어서 menu_ingredient가 엉뚱한(실제로는 존재하지 않는) menu_id=0에
+    # 연결돼버린다. 그래서 day=0인 메뉴만 재료가 하나도 안 뜨는 버그가 났었다.
+    # 세션에 이 모드를 켜두면 0을 "진짜 0"으로 저장해서 day==menu_id 가정이 항상 성립한다.
+    with conn.cursor() as cur:
+        cur.execute("SET SESSION sql_mode = CONCAT(@@sql_mode, ',NO_AUTO_VALUE_ON_ZERO')")
+    return conn
 
 
 def load_ingredient_cache(cursor) -> dict[str, int]:

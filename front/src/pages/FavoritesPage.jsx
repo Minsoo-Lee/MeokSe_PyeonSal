@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { fetchFavoriteMenus, toggleFavorite } from '../api/menu'
 import { getMainIngredientSummary } from '../utils/mainIngredientSummary'
 import { FavoriteBadge } from '../components/RecipeBadgeButtons'
+import Pagination from '../components/Pagination'
 
 const PAGE_SIZE = 8
 
@@ -100,27 +101,7 @@ export default function FavoritesPage() {
           )}
 
           {menus.length > 0 && (
-            <div className="mt-8 flex items-center justify-center gap-2">
-              <button
-                type="button"
-                onClick={() => goToPage(Math.max(1, page - 1))}
-                disabled={page === 1}
-                className="rounded-lg border border-stone-200 px-3 py-1.5 text-sm text-stone-600 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                이전
-              </button>
-              <span className="text-sm text-stone-500">
-                {page} / {totalPages}
-              </span>
-              <button
-                type="button"
-                onClick={() => goToPage(page + 1)}
-                disabled={page >= totalPages}
-                className="rounded-lg border border-stone-200 px-3 py-1.5 text-sm text-stone-600 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                다음
-              </button>
-            </div>
+            <Pagination page={page} totalPages={totalPages} onPageChange={goToPage} />
           )}
         </>
       )}

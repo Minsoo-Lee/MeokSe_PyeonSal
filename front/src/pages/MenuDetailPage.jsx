@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { fetchMenuDetail, toggleChecked, toggleFavorite } from '../api/menu'
 import { CheckBadge, FavoriteBadge } from '../components/RecipeBadgeButtons'
+import { ingredientTypeRank } from '../utils/ingredientTypeOrder'
 
 export default function MenuDetailPage() {
   const { menuId } = useParams()
@@ -75,7 +76,10 @@ export default function MenuDetailPage() {
     )
   }
 
-  const rows = menu.ingredientInfos ?? []
+  // 재료 타입 순서(육류 > 해산물 > 채소 > 곡류 > 양념 > 기타)대로, 같은 타입 안에서는 이름 가나다순.
+  const rows = [...(menu.ingredientInfos ?? [])].sort(
+    (a, b) => ingredientTypeRank(a.type) - ingredientTypeRank(b.type) || a.name.localeCompare(b.name)
+  )
 
   return (
     <section>
@@ -104,16 +108,16 @@ export default function MenuDetailPage() {
           <thead className="bg-stone-100 text-stone-600">
             <tr>
               <th className="px-4 py-3 font-medium">재료 이름</th>
-              <th className="px-4 py-3 font-medium">분류</th>
               <th className="px-4 py-3 font-medium">양</th>
+              <th className="px-4 py-3 font-medium">분류</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-stone-100">
             {rows.map((row, idx) => (
               <tr key={idx}>
                 <td className="px-4 py-3 font-medium text-stone-900">{row.name}</td>
-                <td className="px-4 py-3 text-stone-500">{row.type}</td>
                 <td className="px-4 py-3 text-stone-700">{row.amount}</td>
+                <td className="px-4 py-3 text-stone-500">{row.type}</td>
               </tr>
             ))}
             {rows.length === 0 && (
@@ -154,6 +158,36 @@ export default function MenuDetailPage() {
           />
         </a>
       )}
+
+      {/* day 기준 이전/다음 메뉴 이동. 0일차(만능양념장 같은 준비용 레시피)도 순환에 포함시킨다. */}
+      <div className="mt-5 flex items-center justify-between gap-2">
+        {menu.prevMenuId ? (
+          <Link
+            to={`/menu/${menu.prevMenuId}`}
+            className="min-w-0 flex-1 rounded-lg border border-stone-200 bg-white px-4 py-2 text-sm text-stone-600 transition hover:border-orange-200 hover:text-orange-600"
+          >
+            <span className="block text-xs text-stone-400">← {menu.prevDay}일차</span>
+            <span className="block truncate font-medium">{menu.prevName}</span>
+          </Link>
+        ) : (
+          <span className="flex-1 rounded-lg border border-stone-100 px-4 py-2 text-sm text-stone-300">
+            ← 이전 없음
+          </span>
+        )}
+        {menu.nextMenuId ? (
+          <Link
+            to={`/menu/${menu.nextMenuId}`}
+            className="min-w-0 flex-1 rounded-lg border border-stone-200 bg-white px-4 py-2 text-right text-sm text-stone-600 transition hover:border-orange-200 hover:text-orange-600"
+          >
+            <span className="block text-xs text-stone-400">{menu.nextDay}일차 →</span>
+            <span className="block truncate font-medium">{menu.nextName}</span>
+          </Link>
+        ) : (
+          <span className="flex-1 rounded-lg border border-stone-100 px-4 py-2 text-right text-sm text-stone-300">
+            다음 없음 →
+          </span>
+        )}
+      </div>
     </section>
   )
 }
