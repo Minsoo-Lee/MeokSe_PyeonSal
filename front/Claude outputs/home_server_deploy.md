@@ -137,32 +137,20 @@ docker compose up --build -d
 
 ---
 
-## 7. (홈서버) cloudflared ingress 추가
+## 7. (Cloudflare 대시보드) 퍼블릭 호스트네임 추가
 
-기존 `config.yml`(보통 `/etc/cloudflared/config.yml` 또는 `~/.cloudflared/config.yml`)에 아래 두 줄을 기존 `ingress:` 목록 **맨 위쪽**(더 구체적인 hostname이 먼저 매칭되도록)에 추가:
+`/etc/cloudflared/`에 `token`만 있고 `config.yml`이 없다는 건, 이 터널이 로컬 설정 파일이 아니라 **Cloudflare Zero Trust 대시보드에서 원격으로 관리되는 방식**이라는 뜻. ingress 규칙도 파일 대신 대시보드에서 추가하면 됨.
 
-```yaml
-ingress:
-  - hostname: ochangbab.site
-    service: http://localhost:3000
-  - hostname: api.ochangbab.site
-    service: http://localhost:8082
-  # ... 기존에 있던 다른 프로젝트 ingress 규칙들 ...
-  - service: http_status:404   # catch-all은 항상 맨 마지막
-```
+1. https://one.dash.cloudflare.com 접속
+2. **Networks → Tunnels** → 지금 쓰고 있는 터널 클릭
+3. **Public Hostname** 탭 → **Add a public hostname**을 두 번:
 
-DNS 라우트가 아직 없으면:
+   | Subdomain | Domain | Service |
+   |---|---|---|
+   | (비워둠) | ochangbab.site | HTTP → `localhost:3000` |
+   | api | ochangbab.site | HTTP → `localhost:8082` |
 
-```bash
-cloudflared tunnel route dns <터널이름> ochangbab.site
-cloudflared tunnel route dns <터널이름> api.ochangbab.site
-```
-
-그리고 cloudflared 서비스 재시작:
-
-```bash
-sudo systemctl restart cloudflared   # 또는 네가 쓰는 방식대로
-```
+저장하면 DNS 레코드도 자동 생성되고, cloudflared 재시작도 필요 없이 바로 반영됨 (원격 관리형이라).
 
 ---
 
