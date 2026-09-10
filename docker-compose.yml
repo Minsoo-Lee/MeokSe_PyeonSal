@@ -6,8 +6,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     # 외부에서 직접 DB 붙어볼 일 없으면 이 포트 매핑은 생략해도 됨
-    # ports:
-    #   - "3306:3306"
+    ports:
+      - "3307:3306"
     volumes:
       - msps-mysql-data:/var/lib/mysql
       - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
