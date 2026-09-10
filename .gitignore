@@ -6,6 +6,11 @@
 **/.env
 !**/.env.example
 
+# 확장자 없이 'env'로만 된 파일/비밀값 담긴 잡폴더도 혹시 몰라서 막아둠.
+**/env
+**/*secrets*
+**/*credentials*
+
 # ===== prep/ (파이썬) =====
 prep/venv/
 prep/__pycache__/
