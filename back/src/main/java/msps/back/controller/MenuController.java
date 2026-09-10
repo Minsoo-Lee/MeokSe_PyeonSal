@@ -32,7 +32,8 @@ public class MenuController {
             @PathVariable Long id,
             @AuthenticationPrincipal User user
     ) {
-        return menuService.getMenuDetail(id, user.getId());
+        log.info("[Controller] menuId = {}", id);
+        return menuService.getMenuDetail(user.getId(), id);
     }
 
     @GetMapping("/ingredients")

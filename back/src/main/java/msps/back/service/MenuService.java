@@ -87,7 +87,7 @@ public class MenuService {
                                 mi.getIngredient().getType(),
                                 mi.getAmountType() == AmountType.APPROX ?
                                         mi.getAmountText() :
-                                        mi.getAmountValue() + " " + mi.getAmountUnit()
+                                        formatAmountValue(mi.getAmountValue()) + " " + mi.getAmountUnit()
                         )).toList();
 
         // page 구하기
@@ -99,7 +99,7 @@ public class MenuService {
         boolean checked = checkRepository.findByUserIdAndMenuId(userId, menuId).isPresent();
         boolean favorite = favoriteRepository.findByUserIdAndMenuId(userId, menuId).isPresent();
 
-        return new DailyDetailGetResponse(
+        DailyDetailGetResponse asdf = new DailyDetailGetResponse(
                 menu.getName(),
                 menu.getDay(),
                 menu.getRecipe(),
@@ -108,6 +108,14 @@ public class MenuService {
                 checked,
                 favorite,
                 ingredientInfos);
+        log.info("[asdf] {}", asdf);
+        return asdf;
+    }
+
+    private String formatAmountValue(double value) {
+        return value == Math.floor(value)
+                ? String.valueOf((long) value)
+                : String.valueOf(value);
     }
 
     public List<AllMenuIngredientsGetResponse> getAllData(Long userId) {
