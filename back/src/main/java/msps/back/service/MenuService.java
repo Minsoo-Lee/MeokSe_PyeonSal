@@ -95,11 +95,19 @@ public class MenuService {
         int count = menuRepository.countByDayLessThan(menu.getDay());
         int page = (count / PAGE_SIZE) + 1;
 
+        // 이전/다음 메뉴 (day 기준. 0일차 준비 레시피도 순환에 포함)
+        Menu prevMenu = menuRepository.findFirstByDayLessThanOrderByDayDesc(menu.getDay()).orElse(null);
+        Menu nextMenu = menuRepository.findFirstByDayGreaterThanOrderByDayAsc(menu.getDay()).orElse(null);
+        Long prevMenuId = prevMenu != null ? prevMenu.getId() : null;
+        Integer prevDay = prevMenu != null ? prevMenu.getDay() : null;
+        Long nextMenuId = nextMenu != null ? nextMenu.getId() : null;
+        Integer nextDay = nextMenu != null ? nextMenu.getDay() : null;
+
         // favorite, check 상태 구하기
         boolean checked = checkRepository.findByUserIdAndMenuId(userId, menuId).isPresent();
         boolean favorite = favoriteRepository.findByUserIdAndMenuId(userId, menuId).isPresent();
 
-        DailyDetailGetResponse asdf = new DailyDetailGetResponse(
+        return new DailyDetailGetResponse(
                 menu.getName(),
                 menu.getDay(),
                 menu.getRecipe(),
@@ -107,9 +115,11 @@ public class MenuService {
                 menu.getVideoId(),
                 checked,
                 favorite,
-                ingredientInfos);
-        log.info("[asdf] {}", asdf);
-        return asdf;
+                ingredientInfos,
+                prevMenuId,
+                prevDay,
+                nextMenuId,
+                nextDay);
     }
 
     private String formatAmountValue(double value) {

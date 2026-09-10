@@ -10,7 +10,11 @@ public record DailyDetailGetResponse(
         String videoId,
         boolean checked,
         boolean favorite,
-        List<IngredientInfo> ingredientInfos
+        List<IngredientInfo> ingredientInfos,
+        Long prevMenuId,
+        Integer prevDay,
+        Long nextMenuId,
+        Integer nextDay
 ) {
     public record IngredientInfo(
             String name,
