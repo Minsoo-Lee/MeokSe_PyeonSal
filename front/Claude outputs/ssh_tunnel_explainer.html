@@ -1,0 +1,363 @@
+<title>루프백 뚫기</title>
+<style>
+  :root{
+    --bg:#eef1f6;
+    --surface:#ffffff;
+    --surface-2:#f6f8fb;
+    --text:#131c2b;
+    --text-muted:#5c6b80;
+    --border:#dde4ed;
+    --accent:#3462eb;
+    --accent-strong:#1f47c2;
+    --accent-soft:#e8edfd;
+    --blocked:#c23b22;
+    --blocked-soft:#fbeae5;
+    --ok:#1f8a5f;
+    --ok-soft:#e6f5ee;
+    --shadow: 0 1px 2px rgba(19,28,43,0.04), 0 8px 24px -12px rgba(19,28,43,0.12);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0e1320;
+      --surface:#161d2c;
+      --surface-2:#1c2436;
+      --text:#e7ecf6;
+      --text-muted:#93a1b8;
+      --border:#2a3348;
+      --accent:#7b9bff;
+      --accent-strong:#a9bfff;
+      --accent-soft:#202a47;
+      --blocked:#ff8a70;
+      --blocked-soft:#3a2320;
+      --ok:#4fd399;
+      --ok-soft:#173229;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px -14px rgba(0,0,0,0.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0e1320;
+    --surface:#161d2c;
+    --surface-2:#1c2436;
+    --text:#e7ecf6;
+    --text-muted:#93a1b8;
+    --border:#2a3348;
+    --accent:#7b9bff;
+    --accent-strong:#a9bfff;
+    --accent-soft:#202a47;
+    --blocked:#ff8a70;
+    --blocked-soft:#3a2320;
+    --ok:#4fd399;
+    --ok-soft:#173229;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px -14px rgba(0,0,0,0.6);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:"IBM Plex Sans KR","IBM Plex Sans",-apple-system,sans-serif;
+    padding-inline:20px;
+    padding-block:48px 72px;
+  }
+  .page{ max-width:760px; margin:0 auto; }
+
+  .eyebrow{
+    font-size:12.5px; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--accent); margin:0 0 10px;
+  }
+  h1{
+    font-size:clamp(28px,5vw,38px); font-weight:700; line-height:1.2;
+    margin:0 0 14px; text-wrap:balance;
+  }
+  .lede{
+    font-size:16.5px; line-height:1.7; color:var(--text-muted); max-width:62ch; margin:0 0 40px;
+  }
+  .lede code{ color:var(--text); }
+
+  code, .mono{
+    font-family:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;
+  }
+
+  figure{ margin:0 0 12px; }
+  .diagram-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:20px 20px 8px;
+  }
+  figure svg{ width:100%; height:auto; display:block; }
+  figcaption{
+    font-size:13.5px; color:var(--text-muted); line-height:1.6;
+    padding:14px 4px 4px; border-top:1px solid var(--border); margin-top:14px;
+  }
+
+  /* svg element theming */
+  .box-fill{ fill:var(--surface-2); }
+  .box-stroke{ stroke:var(--border); }
+  .lbl{ fill:var(--text); }
+  .lbl-muted{ fill:var(--text-muted); }
+  .accent-fill{ fill:var(--accent-soft); }
+  .accent-stroke{ stroke:var(--accent); }
+  .accent-line{ stroke:var(--accent); fill:none; }
+  .accent-text{ fill:var(--accent-strong); }
+  .blocked-fill{ fill:var(--blocked-soft); }
+  .blocked-stroke{ stroke:var(--blocked); }
+  .blocked-line{ stroke:var(--blocked); fill:none; }
+  .blocked-text{ fill:var(--blocked); }
+  .ok-fill{ fill:var(--ok-soft); }
+  .ok-stroke{ stroke:var(--ok); }
+  .ok-line{ stroke:var(--ok); fill:none; }
+  .ok-text{ fill:var(--ok); }
+  .divider-line{ stroke:var(--border); }
+
+  .callout{
+    margin:28px 0 40px;
+    background:var(--accent-soft);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px 22px;
+    font-size:15px; line-height:1.75;
+  }
+  .callout strong{ color:var(--accent-strong); }
+  .callout p{ margin:0 0 8px; }
+  .callout p:last-child{ margin-bottom:0; }
+
+  h2{
+    font-size:20px; font-weight:700; margin:44px 0 16px; text-wrap:balance;
+  }
+
+  ol.steps{
+    list-style:none; margin:0; padding:0;
+    display:flex; flex-direction:column; gap:2px;
+    counter-reset:step;
+  }
+  ol.steps li{
+    counter-increment:step;
+    display:flex; gap:16px; align-items:flex-start;
+    padding:14px 4px;
+    border-top:1px solid var(--border);
+  }
+  ol.steps li:first-child{ border-top:none; }
+  ol.steps li::before{
+    content:counter(step);
+    flex:none;
+    width:26px; height:26px; border-radius:50%;
+    background:var(--surface); border:1.5px solid var(--accent); color:var(--accent-strong);
+    font-family:"IBM Plex Mono",monospace; font-size:13px; font-weight:600;
+    display:flex; align-items:center; justify-content:center;
+    margin-top:1px;
+  }
+  ol.steps .who{
+    display:inline-block; font-size:11px; font-weight:600; letter-spacing:.03em;
+    color:var(--text-muted); border:1px solid var(--border); border-radius:5px;
+    padding:1px 6px; margin-bottom:5px;
+  }
+  ol.steps p{ margin:0; font-size:15px; line-height:1.65; }
+  ol.steps code{
+    background:var(--surface-2); border:1px solid var(--border); border-radius:4px;
+    padding:1px 5px; font-size:0.92em;
+  }
+
+  .cmd-block{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    padding:22px;
+    margin:16px 0 40px;
+    overflow-x:auto;
+  }
+  .cmd-line{
+    font-family:"IBM Plex Mono",monospace; font-size:15px;
+    white-space:pre; margin:0 0 18px; color:var(--text);
+  }
+  .cmd-line .tok-flag{ color:var(--accent-strong); font-weight:600; }
+  .cmd-line .tok-local{ color:var(--ok); font-weight:600; }
+  .cmd-line .tok-remote{ color:var(--blocked); font-weight:600; }
+  .cmd-line .tok-host{ color:var(--text-muted); }
+
+  .legend{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:10px 20px; font-size:13.5px; line-height:1.55;
+  }
+  .legend dt{
+    font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:13px;
+    padding:1px 0;
+  }
+  .legend dt.tok-flag{ color:var(--accent-strong); }
+  .legend dt.tok-local{ color:var(--ok); }
+  .legend dt.tok-remote{ color:var(--blocked); }
+  .legend dd{ margin:0 0 10px; color:var(--text-muted); }
+
+  footer{
+    margin-top:56px; padding-top:20px; border-top:1px solid var(--border);
+    font-size:13px; color:var(--text-muted);
+  }
+
+  @media (max-width:480px){
+    .diagram-card{ padding:14px 12px 6px; }
+    .cmd-block{ padding:16px; }
+    .cmd-line{ font-size:13px; }
+  }
+</style>
+
+<div class="page">
+
+  <p class="eyebrow">SSH 로컬 포트 포워딩</p>
+  <h1>루프백 뚫기</h1>
+  <p class="lede">
+    홈서버의 MySQL은 <code>127.0.0.1</code>(자기 자신)에서 온 접속만 받아줘요.
+    그런데 맥에서 <code>load.py</code>를 돌리면 어떻게 그 문을 통과할 수 있을까요?
+    비밀은 &mdash; <strong>진짜로 문을 통과하는 게 아니라, SSH가 문 안쪽까지 대신 들어가서 노크해준다</strong>는 거예요.
+  </p>
+
+  <figure class="diagram-card">
+    <svg viewBox="0 0 720 560" role="img" aria-label="맥에서 홈서버 MySQL로 직접 접속을 시도하면 거부되지만, SSH 터널을 거치면 홈서버 내부에서 sshd가 대신 127.0.0.1로 접속해 MySQL이 받아주는 과정을 보여주는 비교 다이어그램">
+      <defs>
+        <marker id="arrow-accent" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" class="accent-fill" />
+        </marker>
+        <marker id="arrow-ok" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" class="ok-fill" />
+        </marker>
+        <marker id="arrow-blocked" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" class="blocked-fill" />
+        </marker>
+      </defs>
+
+      <!-- ============ TOP: 직접 접속 (막힘) ============ -->
+      <text x="30" y="26" font-size="12.5" font-weight="600" class="blocked-text" letter-spacing="0.02em">시나리오 A · 맥에서 곧장 접속 시도</text>
+
+      <!-- Mac box -->
+      <rect x="30" y="42" width="170" height="120" rx="10" class="box-fill box-stroke" stroke-width="1.2"/>
+      <text x="48" y="68" font-size="13.5" font-weight="700" class="lbl">맥</text>
+      <rect x="48" y="82" width="134" height="30" rx="6" class="box-fill box-stroke" stroke-width="1"/>
+      <text x="115" y="101" font-size="12" text-anchor="middle" class="lbl mono">load.py</text>
+      <text x="48" y="138" font-size="11.5" class="lbl-muted">DB_HOST=100.x.x.x</text>
+      <text x="48" y="153" font-size="11.5" class="lbl-muted">DB_PORT=3307</text>
+
+      <!-- blocked line -->
+      <line x1="204" y1="102" x2="512" y2="102" class="blocked-line" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrow-blocked)"/>
+      <text x="358" y="86" font-size="12" text-anchor="middle" class="blocked-text" font-weight="600">홈서버 IP로 직접 요청</text>
+      <g transform="translate(358,102)">
+        <line x1="-8" y1="-8" x2="8" y2="8" class="blocked-line" stroke-width="2.4"/>
+        <line x1="-8" y1="8" x2="8" y2="-8" class="blocked-line" stroke-width="2.4"/>
+      </g>
+      <text x="358" y="124" font-size="12" text-anchor="middle" class="blocked-text">거부됨</text>
+
+      <!-- Home server box (top) -->
+      <rect x="520" y="42" width="170" height="120" rx="10" class="box-fill box-stroke" stroke-width="1.2"/>
+      <text x="538" y="68" font-size="13.5" font-weight="700" class="lbl">홈서버</text>
+      <rect x="538" y="82" width="134" height="60" rx="6" class="blocked-fill blocked-stroke" stroke-width="1.2"/>
+      <text x="605" y="104" font-size="12.5" text-anchor="middle" font-weight="600" class="blocked-text">MySQL</text>
+      <text x="605" y="122" font-size="11" text-anchor="middle" class="blocked-text mono">127.0.0.1만 허용</text>
+
+      <line x1="30" y1="190" x2="690" y2="190" class="divider-line" stroke-width="1" stroke-dasharray="2 4"/>
+
+      <!-- ============ BOTTOM: SSH 터널 (성공) ============ -->
+      <text x="30" y="222" font-size="12.5" font-weight="600" class="accent-text" letter-spacing="0.02em">시나리오 B · SSH 터널을 거쳐서 접속</text>
+
+      <!-- Mac box -->
+      <rect x="30" y="238" width="200" height="180" rx="10" class="box-fill box-stroke" stroke-width="1.2"/>
+      <text x="48" y="264" font-size="13.5" font-weight="700" class="lbl">맥</text>
+
+      <rect x="48" y="278" width="164" height="30" rx="6" class="box-fill box-stroke" stroke-width="1"/>
+      <text x="130" y="297" font-size="12" text-anchor="middle" class="lbl mono">load.py</text>
+
+      <line x1="130" y1="308" x2="130" y2="326" class="accent-line" stroke-width="1.6" marker-end="url(#arrow-accent)"/>
+      <text x="140" y="321" font-size="10.5" class="lbl-muted">접속</text>
+
+      <rect x="48" y="330" width="164" height="52" rx="6" class="accent-fill accent-stroke" stroke-width="1.2"/>
+      <text x="130" y="350" font-size="12.5" text-anchor="middle" font-weight="600" class="accent-text mono">localhost:3307</text>
+      <text x="130" y="368" font-size="10.5" text-anchor="middle" class="accent-text">SSH가 맥에 열어둔 가짜 문</text>
+
+      <!-- tunnel pipe -->
+      <line x1="234" y1="356" x2="514" y2="356" class="accent-line" stroke-width="6" stroke-linecap="round" marker-end="url(#arrow-accent)"/>
+      <text x="374" y="336" font-size="12" text-anchor="middle" font-weight="600" class="accent-text">SSH 암호화 터널 · 22번 포트</text>
+      <text x="374" y="378" font-size="11" text-anchor="middle" class="lbl-muted">(SSH 로그인 인증을 통과해야만 열림)</text>
+
+      <!-- Home server box (bottom) -->
+      <rect x="520" y="238" width="180" height="220" rx="10" class="box-fill box-stroke" stroke-width="1.2"/>
+      <text x="538" y="264" font-size="13.5" font-weight="700" class="lbl">홈서버</text>
+
+      <rect x="538" y="278" width="144" height="30" rx="6" class="accent-fill accent-stroke" stroke-width="1"/>
+      <text x="610" y="297" font-size="12" text-anchor="middle" font-weight="600" class="accent-text mono">sshd :22</text>
+
+      <line x1="610" y1="308" x2="610" y2="328" class="ok-line" stroke-width="1.6" marker-end="url(#arrow-ok)"/>
+      <text x="622" y="323" font-size="10.5" class="lbl-muted">내부에서</text>
+
+      <rect x="538" y="332" width="144" height="60" rx="6" class="ok-fill ok-stroke" stroke-width="1.2"/>
+      <text x="610" y="354" font-size="12.5" text-anchor="middle" font-weight="600" class="ok-text mono">127.0.0.1:3307</text>
+      <text x="610" y="372" font-size="10.5" text-anchor="middle" class="ok-text">= 홈서버 자기 자신</text>
+
+      <line x1="610" y1="392" x2="610" y2="410" class="ok-line" stroke-width="1.6" marker-end="url(#arrow-ok)"/>
+
+      <rect x="556" y="414" width="108" height="34" rx="6" class="box-fill ok-stroke" stroke-width="1.2"/>
+      <text x="610" y="436" font-size="12.5" text-anchor="middle" font-weight="700" class="ok-text">MySQL ✓</text>
+    </svg>
+    <figcaption>
+      시나리오 A: 맥이 홈서버 IP로 3307번 포트에 곧장 접속하면, MySQL은 &ldquo;127.0.0.1에서 온 게 아니다&rdquo;라며 거부한다.
+      시나리오 B: 같은 요청을 SSH 터널에 태우면, 실제로 MySQL 앞에서 노크하는 건 <em>홈서버 안에 있는 sshd 자신</em>이 되어 &mdash; 루프백 조건을 그대로 만족시킨다.
+    </figcaption>
+  </figure>
+
+  <div class="callout">
+    <p><strong>핵심은 &ldquo;localhost&rdquo;가 그림에 두 번 나온다는 것</strong>이에요. 맥의 <code>localhost:3307</code>과 홈서버의 <code>localhost:3307</code>은 이름만 같을 뿐, 물리적으로 완전히 다른 소켓이에요.</p>
+    <p>맥의 것은 SSH 클라이언트가 만들어둔 <strong>가짜 입구</strong>고, 홈서버의 것은 sshd가 마지막에 접속하는 <strong>진짜 loopback</strong>이에요. <code>-L 3307:localhost:3307</code>에서 앞의 <code>3307</code>은 맥 기준, 뒤의 <code>localhost:3307</code>은 &mdash; SSH로 로그인한 <strong>홈서버 기준</strong>이라는 게 이 트릭의 전부예요.</p>
+  </div>
+
+  <h2>패킷 하나가 지나가는 다섯 걸음</h2>
+  <ol class="steps">
+    <li>
+      <div>
+        <span class="who">맥</span>
+        <p><code>ssh -fNL 3307:localhost:3307 user@homeserver</code> 실행 → 맥의 <code>localhost:3307</code>에 SSH가 리스닝 포트를 하나 열어둠 (아직 아무 통신도 없음, 대기만).</p>
+      </div>
+    </li>
+    <li>
+      <div>
+        <span class="who">맥</span>
+        <p><code>load.py</code>가 <code>prep/.env</code>의 <code>DB_HOST=localhost, DB_PORT=3307</code>대로 이 가짜 문에 접속.</p>
+      </div>
+    </li>
+    <li>
+      <div>
+        <span class="who">맥 → 홈서버</span>
+        <p>SSH 클라이언트가 이 데이터를 통째로 암호화해서, 이미 열려있는 SSH 연결(홈서버의 22번 포트)에 실어서 전송.</p>
+      </div>
+    </li>
+    <li>
+      <div>
+        <span class="who">홈서버</span>
+        <p><code>sshd</code>가 데이터를 복호화하고, <code>-L</code>에 적힌 목적지 <code>localhost:3307</code> — 즉 <strong>홈서버 자기 자신</strong>의 <code>127.0.0.1:3307</code>로 새 연결을 만들어 대신 접속.</p>
+      </div>
+    </li>
+    <li>
+      <div>
+        <span class="who">홈서버</span>
+        <p>MySQL이 소켓을 보니 발신지가 <code>127.0.0.1</code> — 규칙대로 loopback이니 접속을 허용. 응답은 같은 경로를 거꾸로 타고 <code>load.py</code>에게 돌아감.</p>
+      </div>
+    </li>
+  </ol>
+
+  <h2>명령어 한 줄 해부</h2>
+  <div class="cmd-block">
+    <p class="cmd-line">ssh <span class="tok-flag">-fNL</span> <span class="tok-local">3307</span>:<span class="tok-remote">localhost:3307</span> <span class="tok-host">user@homeserver</span></p>
+    <dl class="legend">
+      <dt class="tok-flag">-f -N -L</dt>
+      <dd>백그라운드 실행(f) + 셸은 안 띄우고 포워딩만(N) + 로컬 포트 포워딩(L). 셋 다 인자가 없어서 붙여 써도 동일.</dd>
+      <dt class="tok-local">앞의 3307</dt>
+      <dd>맥에 새로 여는 포트 번호. 이 숫자만 맥 기준.</dd>
+      <dt class="tok-remote">localhost:3307</dt>
+      <dd>SSH로 로그인한 <strong>홈서버가</strong> 최종적으로 접속할 주소. 홈서버 입장의 &ldquo;자기 자신&rdquo;.</dd>
+      <dt class="tok-host">user@homeserver</dt>
+      <dd>이 터널을 열 수 있는 자격 — SSH 로그인 인증을 통과한 사람만 애초에 이 통로를 만들 수 있음.</dd>
+    </dl>
+  </div>
+
+  <footer>
+    먹세편살 &middot; <code>prep/load.py</code>를 홈서버 DB에 붙일 때 쓰는 SSH 로컬 포트 포워딩 원리 정리
+  </footer>
+
+</div>

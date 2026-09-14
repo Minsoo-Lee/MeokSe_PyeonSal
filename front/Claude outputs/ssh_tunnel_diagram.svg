@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 720 560" xmlns="http://www.w3.org/2000/svg" width="1440" height="1120">
+<style>
+  html,body{ margin:0; padding:0; background:#ffffff; }
+  .box-fill{ fill:#f6f8fb; }
+  .box-stroke{ stroke:#dde4ed; }
+  .lbl{ fill:#131c2b; }
+  .lbl-muted{ fill:#5c6b80; }
+  .accent-fill{ fill:#e8edfd; }
+  .accent-stroke{ stroke:#3462eb; }
+  .accent-line{ stroke:#3462eb; fill:none; }
+  .accent-text{ fill:#1f47c2; }
+  .blocked-fill{ fill:#fbeae5; }
+  .blocked-stroke{ stroke:#c23b22; }
+  .blocked-line{ stroke:#c23b22; fill:none; }
+  .blocked-text{ fill:#c23b22; }
+  .ok-fill{ fill:#e6f5ee; }
+  .ok-stroke{ stroke:#1f8a5f; }
+  .ok-line{ stroke:#1f8a5f; fill:none; }
+  .ok-text{ fill:#1f8a5f; }
+  .divider-line{ stroke:#dde4ed; }
+  text{ font-family:"IBM Plex Sans KR","Noto Sans KR","Apple SD Gothic Neo",-apple-system,sans-serif; }
+  .mono{ font-family:"IBM Plex Mono","SFMono-Regular",Consolas,monospace; }
+</style>
+  <rect x="0" y="0" width="720" height="560" fill="#ffffff"/>
+  <defs>
+    <marker id="arrow-accent" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="accent-fill" />
+    </marker>
+    <marker id="arrow-ok" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="ok-fill" />
+    </marker>
+    <marker id="arrow-blocked" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="blocked-fill" />
+    </marker>
+  </defs>
+
+  <!-- ============ TOP: 직접 접속 (막힘) ============ -->
+  <text x="30" y="26" font-size="12.5" font-weight="600" class="blocked-text" letter-spacing="0.02em">시나리오 A · 맥에서 곧장 접속 시도</text>
+
+  <rect x="30" y="42" width="170" height="120" rx="10" class="box-fill box-stroke" stroke-width="1.2"/>
+  <text x="48" y="68" font-size="13.5" font-weight="700" class="lbl">맥</text>
+  <rect x="48" y="82" width="134" height="30" rx="6" class="box-fill box-stroke" stroke-width="1"/>
+  <text x="115" y="101" font-size="12" text-anchor="middle" class="lbl mono">load.py</text>
+  <text x="48" y="138" font-size="11.5" class="lbl-muted">DB_HOST=100.x.x.x</text>
+  <text x="48" y="153" font-size="11.5" class="lbl-muted">DB_PORT=3307</text>
+
+  <line x1="204" y1="102" x2="512" y2="102" class="blocked-line" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrow-blocked)"/>
+  <text x="358" y="86" font-size="12" text-anchor="middle" class="blocked-text" font-weight="600">홈서버 IP로 직접 요청</text>
+  <g transform="translate(358,102)">
+    <line x1="-8" y1="-8" x2="8" y2="8" class="blocked-line" stroke-width="2.4"/>
+    <line x1="-8" y1="8" x2="8" y2="-8" class="blocked-line" stroke-width="2.4"/>
+  </g>
+  <text x="358" y="124" font-size="12" text-anchor="middle" class="blocked-text">거부됨</text>
+
+  <rect x="520" y="42" width="170" height="120" rx="10" class="box-fill box-stroke" stroke-width="1.2"/>
+  <text x="538" y="68" font-size="13.5" font-weight="700" class="lbl">홈서버</text>
+  <rect x="538" y="82" width="134" height="60" rx="6" class="blocked-fill blocked-stroke" stroke-width="1.2"/>
+  <text x="605" y="104" font-size="12.5" text-anchor="middle" font-weight="600" class="blocked-text">MySQL</text>
+  <text x="605" y="122" font-size="11" text-anchor="middle" class="blocked-text mono">127.0.0.1만 허용</text>
+
+  <line x1="30" y1="190" x2="690" y2="190" class="divider-line" stroke-width="1" stroke-dasharray="2 4"/>
+
+  <!-- ============ BOTTOM: SSH 터널 (성공) ============ -->
+  <text x="30" y="222" font-size="12.5" font-weight="600" class="accent-text" letter-spacing="0.02em">시나리오 B · SSH 터널을 거쳐서 접속</text>
+
+  <rect x="30" y="238" width="200" height="180" rx="10" class="box-fill box-stroke" stroke-width="1.2"/>
+  <text x="48" y="264" font-size="13.5" font-weight="700" class="lbl">맥</text>
+
+  <rect x="48" y="278" width="164" height="30" rx="6" class="box-fill box-stroke" stroke-width="1"/>
+  <text x="130" y="297" font-size="12" text-anchor="middle" class="lbl mono">load.py</text>
+
+  <line x1="130" y1="308" x2="130" y2="326" class="accent-line" stroke-width="1.6" marker-end="url(#arrow-accent)"/>
+  <text x="140" y="321" font-size="10.5" class="lbl-muted">접속</text>
+
+  <rect x="48" y="330" width="164" height="52" rx="6" class="accent-fill accent-stroke" stroke-width="1.2"/>
+  <text x="130" y="350" font-size="12.5" text-anchor="middle" font-weight="600" class="accent-text mono">localhost:3307</text>
+  <text x="130" y="368" font-size="10.5" text-anchor="middle" class="accent-text">SSH가 맥에 열어둔 가짜 문</text>
+
+  <line x1="234" y1="356" x2="514" y2="356" class="accent-line" stroke-width="6" stroke-linecap="round" marker-end="url(#arrow-accent)"/>
+  <text x="374" y="336" font-size="12" text-anchor="middle" font-weight="600" class="accent-text">SSH 암호화 터널 · 22번 포트</text>
+  <text x="374" y="378" font-size="11" text-anchor="middle" class="lbl-muted">(SSH 로그인 인증을 통과해야만 열림)</text>
+
+  <rect x="520" y="238" width="180" height="220" rx="10" class="box-fill box-stroke" stroke-width="1.2"/>
+  <text x="538" y="264" font-size="13.5" font-weight="700" class="lbl">홈서버</text>
+
+  <rect x="538" y="278" width="144" height="30" rx="6" class="accent-fill accent-stroke" stroke-width="1"/>
+  <text x="610" y="297" font-size="12" text-anchor="middle" font-weight="600" class="accent-text mono">sshd :22</text>
+
+  <line x1="610" y1="308" x2="610" y2="328" class="ok-line" stroke-width="1.6" marker-end="url(#arrow-ok)"/>
+  <text x="622" y="323" font-size="10.5" class="lbl-muted">내부에서</text>
+
+  <rect x="538" y="332" width="144" height="60" rx="6" class="ok-fill ok-stroke" stroke-width="1.2"/>
+  <text x="610" y="354" font-size="12.5" text-anchor="middle" font-weight="600" class="ok-text mono">127.0.0.1:3307</text>
+  <text x="610" y="372" font-size="10.5" text-anchor="middle" class="ok-text">= 홈서버 자기 자신</text>
+
+  <line x1="610" y1="392" x2="610" y2="410" class="ok-line" stroke-width="1.6" marker-end="url(#arrow-ok)"/>
+
+  <rect x="556" y="414" width="108" height="34" rx="6" class="box-fill ok-stroke" stroke-width="1.2"/>
+  <text x="610" y="436" font-size="12.5" text-anchor="middle" font-weight="700" class="ok-text">MySQL ✓</text>
+</svg>
