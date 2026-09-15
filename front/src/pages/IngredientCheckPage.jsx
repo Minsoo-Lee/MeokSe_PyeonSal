@@ -7,7 +7,6 @@ export default function IngredientCheckPage() {
   const [status, setStatus] = useState('loading') // 'loading' | 'error' | 'done'
 
   const [selectedDays, setSelectedDays] = useState(new Set())
-  const [anchorDay, setAnchorDay] = useState(null)
 
   useEffect(() => {
     let ignore = false
@@ -32,41 +31,27 @@ export default function IngredientCheckPage() {
   const sortedMenus = [...menuInfos].sort((a, b) => a.day - b.day)
 
   /**
-   * 카드 클릭 규칙 (날짜 범위 피커랑 동일한 방식):
-   *  - 아무것도 선택 안 된 상태에서 누르면: 그 날짜 하나만 선택 + 기준점(anchor)으로 저장
-   *  - 이미 기준점이 있는 상태에서 "선택 안 된" 다른 날짜를 누르면: 기준점~그 날짜 사이를 전부 선택
-   *  - 이미 "선택된" 날짜를 다시 누르면: 그 날짜 하나만 개별적으로 선택 해제
+   * 카드 클릭 규칙: 누른 날짜 하나만 선택/해제 (범위 자동 채움 없음).
+   * 여러 날짜를 보고 싶으면 각 카드를 하나씩 눌러서 선택하면 됨.
    */
   function toggleDay(day) {
     setSelectedDays((prev) => {
       const next = new Set(prev)
-
       if (next.has(day)) {
         next.delete(day)
-        if (day === anchorDay) setAnchorDay(null)
-        return next
-      }
-
-      if (anchorDay === null) {
-        setAnchorDay(day)
+      } else {
         next.add(day)
-        return next
       }
-
-      const [start, end] = anchorDay < day ? [anchorDay, day] : [day, anchorDay]
-      for (let d = start; d <= end; d++) next.add(d)
       return next
     })
   }
 
   function selectAll() {
     setSelectedDays(new Set(sortedMenus.map((m) => m.day)))
-    setAnchorDay(null)
   }
 
   function clearAll() {
     setSelectedDays(new Set())
-    setAnchorDay(null)
   }
 
   const sortedSelectedDays = Array.from(selectedDays).sort((a, b) => a - b)
@@ -77,7 +62,7 @@ export default function IngredientCheckPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-stone-900">재료 모아보기</h1>
         <p className="mt-1 text-sm text-stone-500">
-          카드를 눌러 확인할 날짜를 골라보세요. 이어서 다른 카드를 누르면 그 사이 구간이 한 번에 선택돼요.
+          카드를 눌러 확인할 날짜를 하나씩 골라보세요. 여러 날짜를 함께 선택할 수 있어요.
         </p>
       </div>
 
