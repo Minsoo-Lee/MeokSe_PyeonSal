@@ -37,9 +37,7 @@ export default function Layout() {
 
             {user && (
               <div className="ml-2 flex items-center gap-2 border-l border-stone-200 pl-3">
-                <span className="hidden text-sm font-medium text-stone-600 sm:inline">
-                  {user.name}님
-                </span>
+                <span className="text-sm font-medium text-stone-600">{user.name}님</span>
                 <button
                   type="button"
                   onClick={logout}
