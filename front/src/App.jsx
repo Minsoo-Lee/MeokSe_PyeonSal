@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage'
 import ErrorPage from './pages/ErrorPage'
 import OAuthCallbackPage from './pages/OAuthCallbackPage'
 import UserSignupPage from './pages/UserSignupPage'
+import HomePage from './pages/HomePage'
 import MenuListPage from './pages/MenuListPage'
 import MenuDetailPage from './pages/MenuDetailPage'
 import IngredientCheckPage from './pages/IngredientCheckPage'
@@ -25,7 +26,8 @@ export default function App() {
             <Route path="/user/signup" element={<UserSignupPage />} />
 
             <Route element={<Layout />}>
-              <Route path="/" element={<MenuListPage />} />
+              <Route path="/" element={<HomePage />} />
+              <Route path="/menus" element={<MenuListPage />} />
               <Route path="/menu/:menuId" element={<MenuDetailPage />} />
               <Route path="/ingredients" element={<IngredientCheckPage />} />
               <Route path="/favorites" element={<FavoritesPage />} />

@@ -1,5 +1,6 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import UpdateBanner from './UpdateBanner'
 
 const navLinkClass = ({ isActive }) =>
   [
@@ -15,13 +16,16 @@ export default function Layout() {
   return (
     <div className="min-h-screen bg-stone-50">
       <header className="border-b border-stone-200 bg-white">
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4 sm:px-6">
-          <div>
+        <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6">
+          <Link to="/" className="transition hover:opacity-80">
             <p className="text-lg font-semibold text-stone-900">먹세편살</p>
             <p className="text-xs text-stone-500">레시피 &amp; 재료 확인</p>
-          </div>
-          <nav className="flex items-center gap-2">
+          </Link>
+          <nav className="flex flex-wrap items-center gap-2">
             <NavLink to="/" end className={navLinkClass}>
+              홈
+            </NavLink>
+            <NavLink to="/menus" className={navLinkClass}>
               일별 메뉴
             </NavLink>
             <NavLink to="/ingredients" className={navLinkClass}>
@@ -33,14 +37,9 @@ export default function Layout() {
 
             {user && (
               <div className="ml-2 flex items-center gap-2 border-l border-stone-200 pl-3">
-                {user.pictureUrl && (
-                  <img
-                    src={user.pictureUrl}
-                    alt={user.name ?? '프로필'}
-                    className="h-7 w-7 rounded-full"
-                  />
-                )}
-                <span className="hidden text-sm text-stone-600 sm:inline">{user.name}</span>
+                <span className="hidden text-sm font-medium text-stone-600 sm:inline">
+                  {user.name}님
+                </span>
                 <button
                   type="button"
                   onClick={logout}
@@ -53,6 +52,8 @@ export default function Layout() {
           </nav>
         </div>
       </header>
+
+      <UpdateBanner />
 
       <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
         <Outlet />

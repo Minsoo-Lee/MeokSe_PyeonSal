@@ -14,3 +14,16 @@ export async function signup(name) {
     body: JSON.stringify({ name }),
   })
 }
+
+/**
+ * 업데이트 배너를 닫았을 때, 지금 본 버전을 서버(users.last_seen_version)에 기록.
+ * 백엔드: POST /user/version
+ * Request Body: { version: string }
+ */
+export async function markVersionSeen(version) {
+  return apiFetch('/user/version', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ version }),
+  })
+}

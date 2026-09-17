@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>먹세편살 — 홈 화면 와이어프레임 (데스크탑)</title>
+<style>
+  :root{
+    --stone-50:#fafaf9; --stone-100:#f5f5f4; --stone-200:#e7e5e4; --stone-300:#d6d3d1;
+    --stone-400:#a8a29e; --stone-500:#78716c; --stone-600:#57534e; --stone-900:#1c1917;
+    --orange-50:#fff7ed; --orange-100:#ffedd5; --orange-200:#fed7aa; --orange-400:#fb923c;
+    --orange-500:#f97316; --orange-600:#ea580c; --orange-700:#c2410c;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:32px 16px; background:var(--stone-100);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    color:var(--stone-900);
+  }
+  h1.page-title{ text-align:center; font-size:20px; font-weight:700; margin:0 0 4px; }
+  p.page-sub{ text-align:center; color:var(--stone-500); font-size:13px; margin:0 0 28px; }
+
+  .wrap{ max-width:1040px; margin:0 auto; }
+
+  /* browser frame */
+  .browser{
+    background:#fff; border-radius:14px; overflow:hidden;
+    box-shadow:0 16px 40px rgba(0,0,0,.14); border:1px solid var(--stone-200);
+  }
+  .browser-bar{
+    background:var(--stone-100); border-bottom:1px solid var(--stone-200);
+    padding:10px 14px; display:flex; align-items:center; gap:10px;
+  }
+  .dot{ width:10px; height:10px; border-radius:999px; }
+  .dot.r{ background:#f87171; } .dot.y{ background:#fbbf24; } .dot.g{ background:#34d399; }
+  .url{
+    flex:1; background:#fff; border:1px solid var(--stone-200); border-radius:8px;
+    padding:5px 12px; font-size:11px; color:var(--stone-500);
+  }
+
+  .app-header{
+    background:#fff; border-bottom:1px solid var(--stone-200);
+    padding:16px 32px; display:flex; align-items:center; justify-content:space-between;
+  }
+  .app-title{ font-size:16px; font-weight:700; }
+  .app-title small{ display:block; font-weight:400; font-size:11px; color:var(--stone-500); }
+  .navpills{ display:flex; gap:6px; }
+  .navpill{ font-size:12px; padding:7px 14px; border-radius:999px; color:var(--stone-500); }
+  .navpill.active{ background:var(--orange-500); color:#fff; font-weight:600; }
+  .avatar{ width:26px; height:26px; border-radius:999px; background:var(--stone-300); margin-left:10px; }
+  .headerright{ display:flex; align-items:center; }
+
+  .content{ padding:32px; max-width:900px; margin:0 auto; }
+  .rel{ position:relative; margin-bottom:20px; }
+
+  .badge-num{
+    position:absolute; top:-9px; left:-9px; width:22px; height:22px; border-radius:999px;
+    background:var(--stone-900); color:#fff; font-size:12px; font-weight:700;
+    display:flex; align-items:center; justify-content:center; z-index:2;
+  }
+
+  /* row A: greeting + compact progress */
+  .row-a{ display:flex; align-items:center; justify-content:space-between; gap:20px; }
+  .greeting{ font-size:19px; font-weight:700; margin:0 0 2px; }
+  .greeting-sub{ font-size:13px; color:var(--stone-500); margin:0; }
+  .progress-widget{
+    background:#fff; border:1px solid var(--stone-200); border-radius:12px; padding:10px 16px;
+    display:flex; align-items:center; gap:12px; min-width:260px;
+  }
+  .progress-text{ font-size:12px; color:var(--stone-600); white-space:nowrap; }
+  .progress-text b{ color:var(--orange-600); }
+  .progress-track{ flex:1; height:7px; background:var(--stone-100); border-radius:999px; overflow:hidden; }
+  .progress-fill{ height:100%; width:38%; background:var(--orange-400); border-radius:999px; }
+
+  /* row B: highlight full width, horizontal */
+  .highlight{
+    background:linear-gradient(120deg, var(--orange-50), #fff);
+    border:1.5px solid var(--orange-200); border-radius:16px; padding:22px 26px;
+    display:flex; align-items:center; justify-content:space-between; gap:24px;
+  }
+  .highlight-left{ display:flex; align-items:center; gap:18px; }
+  .highlight-emoji{ font-size:34px; }
+  .highlight-eyebrow{ font-size:10.5px; font-weight:700; color:var(--orange-700); text-transform:uppercase; letter-spacing:.04em; margin:0 0 6px; }
+  .highlight-day{ display:inline-block; background:var(--orange-100); color:var(--orange-700); font-size:11px; font-weight:700; padding:3px 10px; border-radius:999px; margin-bottom:8px; }
+  .highlight-name{ font-size:19px; font-weight:700; margin:0 0 4px; }
+  .highlight-desc{ font-size:12.5px; color:var(--stone-500); margin:0; }
+  .btn-primary{
+    flex:0 0 auto; background:var(--orange-500); color:#fff; font-size:13px; font-weight:700;
+    padding:11px 22px; border-radius:10px; white-space:nowrap;
+  }
+
+  /* row C: favorites (span2) + tiles (span1) */
+  .row-c{ display:grid; grid-template-columns:2fr 1fr; gap:20px; }
+  .sec-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .sec-title{ font-size:14px; font-weight:700; }
+  .sec-link{ font-size:12px; color:var(--orange-600); font-weight:600; }
+  .fav-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .fav-card{ background:#fff; border:1px solid var(--stone-200); border-radius:12px; padding:12px; }
+  .fav-day{ font-size:10px; font-weight:700; color:var(--orange-700); background:var(--orange-100); border-radius:999px; padding:2px 7px; display:inline-block; margin-bottom:7px; }
+  .heart{ float:right; font-size:12px; color:var(--orange-400); }
+  .fav-name{ font-size:12.5px; font-weight:600; margin:0; }
+
+  .tiles{ display:flex; flex-direction:column; gap:10px; }
+  .tile{
+    background:#fff; border:1px solid var(--stone-200); border-radius:12px; padding:14px;
+    display:flex; align-items:center; gap:12px;
+  }
+  .tile-icon{ font-size:20px; }
+  .tile-title{ font-size:12.5px; font-weight:700; margin:0 0 1px; }
+  .tile-sub{ font-size:10.5px; color:var(--stone-500); margin:0; }
+
+  /* notes below */
+  .notes{ max-width:1040px; margin:24px auto 0; display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media (max-width:700px){ .notes{ grid-template-columns:1fr; } }
+  .note{
+    background:#fff; border:1px solid var(--stone-200); border-radius:12px; padding:12px 14px;
+    display:flex; gap:10px; font-size:12.5px; line-height:1.55; color:var(--stone-600);
+  }
+  .note b{
+    flex:0 0 auto; width:22px; height:22px; border-radius:999px; background:var(--stone-900); color:#fff;
+    font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center;
+  }
+  .note .t{ font-weight:700; color:var(--stone-900); display:block; margin-bottom:2px; }
+  .note.tip{ background:var(--orange-50); border-color:var(--orange-200); grid-column:1 / -1; }
+</style>
+</head>
+<body>
+
+<h1 class="page-title">🖥️ 홈 화면 와이어프레임 — 데스크탑</h1>
+<p class="page-sub">모바일이랑 섹션 구성은 똑같음 — 넓은 화면이니까 "위아래로 쌓기"보다 "옆으로 나란히"로만 배치를 바꿈</p>
+
+<div class="wrap">
+  <div class="browser">
+    <div class="browser-bar">
+      <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+      <div class="url">🔒 ochangbab.site</div>
+    </div>
+
+    <div class="app-header">
+      <div class="app-title">먹세편살<small>레시피 &amp; 재료 확인</small></div>
+      <div class="headerright">
+        <div class="navpills">
+          <span class="navpill active">홈</span>
+          <span class="navpill">일별 메뉴</span>
+          <span class="navpill">재료 확인</span>
+          <span class="navpill">즐겨찾기</span>
+        </div>
+        <div class="avatar"></div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <div class="rel row-a">
+        <span class="badge-num">1</span>
+        <div>
+          <p class="greeting">민수님, 안녕하세요 👋</p>
+          <p class="greeting-sub">오늘은 뭘 만들어볼까요?</p>
+        </div>
+        <div class="progress-widget">
+          <span class="progress-text"><b>23</b> / 60일 완료</span>
+          <div class="progress-track"><div class="progress-fill"></div></div>
+        </div>
+      </div>
+      <div class="rel" style="margin-top:-6px;"><span class="badge-num" style="opacity:0;">2</span></div>
+
+      <div class="rel">
+        <span class="badge-num">3</span>
+        <div class="highlight">
+          <div class="highlight-left">
+            <span class="highlight-emoji">🍲</span>
+            <div>
+              <p class="highlight-eyebrow">다음 메뉴</p>
+              <span class="highlight-day">24일차</span>
+              <p class="highlight-name">두부조림 &amp; 계란찜</p>
+              <p class="highlight-desc">아직 안 만들어본 메뉴예요. 필요한 재료도 같이 확인해보세요.</p>
+            </div>
+          </div>
+          <span class="btn-primary">레시피 보기 →</span>
+        </div>
+      </div>
+
+      <div class="rel row-c">
+        <span class="badge-num">4</span>
+        <div>
+          <div class="sec-head">
+            <span class="sec-title">즐겨찾기</span>
+            <span class="sec-link">전체보기 →</span>
+          </div>
+          <div class="fav-grid">
+            <div class="fav-card"><span class="heart">♥</span><span class="fav-day">7일차</span><p class="fav-name">김치찌개</p></div>
+            <div class="fav-card"><span class="heart">♥</span><span class="fav-day">15일차</span><p class="fav-name">제육볶음</p></div>
+            <div class="fav-card"><span class="heart">♥</span><span class="fav-day">19일차</span><p class="fav-name">순두부찌개</p></div>
+          </div>
+        </div>
+        <div class="tiles" style="position:relative;">
+          <span class="badge-num" style="left:auto; right:-9px;">5</span>
+          <div class="tile"><span class="tile-icon">📅</span><div><p class="tile-title">일별 메뉴</p><p class="tile-sub">전체 목록 보기</p></div></div>
+          <div class="tile"><span class="tile-icon">🧺</span><div><p class="tile-title">재료 모아보기</p><p class="tile-sub">여러 날 한번에</p></div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="notes">
+  <div class="note"><b>1</b><div><span class="t">인사말 + 진행 현황을 한 줄로</span>모바일에서는 따로따로 쌓였던 두 블록을 데스크탑에서는 좌우로 나란히 배치. 화면이 넓으니 굳이 세로로 쌓아둘 필요가 없음.</div></div>
+  <div class="note"><b>3</b><div><span class="t">다음 메뉴 하이라이트</span>모바일은 세로(뱃지→제목→설명→버튼), 데스크탑은 가로(아이콘+텍스트 묶음 | 버튼)로. 내용은 완전히 동일, 배치만 가로로.</div></div>
+  <div class="note"><b>4</b><div><span class="t">즐겨찾기 — 3열 그리드</span>가로 스크롤 대신 3개를 한 줄에 다 보여줌 (모바일은 공간이 없어서 가로 스크롤이 필요했던 것).</div></div>
+  <div class="note"><b>5</b><div><span class="t">바로가기 타일 — 사이드바처럼</span>즐겨찾기 옆에 세로로 붙여서 "보조 패널"처럼. 2:1 비율(<code>grid-template-columns: 2fr 1fr</code>)이라 즐겨찾기가 주인공, 타일은 옆에서 보조.</div></div>
+  <div class="note tip"><b>!</b><div><span class="t">구현 관련 메모</span>지금 코드 기준으로는 Tailwind 반응형 클래스(<code>lg:</code> prefix) 몇 개만 추가하면 됨 — <code>IngredientCheckPage</code>에서 이미 <code>lg:grid-cols-2</code>로 이런 식의 레이아웃 전환을 쓰고 있어서 패턴은 똑같이 가져다 쓸 수 있음. 새 컴포넌트 구조가 필요한 게 아니라 CSS 브레이크포인트만 얹는 정도.</div></div>
+</div>
+
+</body>
+</html>

@@ -67,7 +67,7 @@ export default function MenuDetailPage() {
       <section>
         <p className="text-sm text-stone-500">메뉴를 찾을 수 없습니다.</p>
         <Link
-          to="/"
+          to="/menus"
           className="mt-4 inline-block text-sm font-medium text-orange-600 hover:text-orange-700"
         >
           ← 목록으로
@@ -84,7 +84,7 @@ export default function MenuDetailPage() {
   return (
     <section>
       <Link
-        to={`/?page=${menu.page ?? 1}`}
+        to={`/menus?page=${menu.page ?? 1}`}
         className="mb-5 inline-block text-sm font-medium text-stone-500 hover:text-orange-600"
       >
         ← 목록으로
