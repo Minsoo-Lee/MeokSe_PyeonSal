@@ -28,7 +28,7 @@ public class UserController {
     @PostMapping("/signup")
     public UserSignupResponse UserSignup(
             @AuthenticationPrincipal User user,
-            UserSignupRequest dto) {
+            @RequestBody UserSignupRequest dto) {
         user.completeSignup(dto.name());
         // 방금 가입한 사람한테는 가입 시점의 버전을 "이미 본 것"으로 처리해서,
         // 로그인하자마자 업데이트 배너가 뜨지 않게 한다.
