@@ -158,23 +158,34 @@ public class MenuService {
                 allMap.put(menuId, dto);
             }
             AllMenuIngredientsGetResponse response = allMap.get(mi.getMenu().getId());
-            if (!mi.getIngredient().getType().equals("양념")) {
-                response.addIngredientInfo(
-                        new AllMenuIngredientsGetResponse.IngredientInfo(
-                                mi.getIngredient().getId(),
-                                mi.getIngredient().getName(),
-                                mi.getIngredient().getType(),
-                                mi.getAmountType(),
-                                mi.getAmountValue(),
-                                mi.getAmountUnit(),
-                                mi.getAmountText()
-                        )
-                );
+
+            // 만능양념장(0일차, menu_id=0)에 한해서는 양념도 포함해 재료를 전부 보여준다.
+            if (mi.getMenu().getId() == 0) {
+                response.addIngredientInfo(getInfo(mi));
+            }
+            else {
+                if (!mi.getIngredient().getType().equals("양념")) {
+                    response.addIngredientInfo(
+                            getInfo(mi)
+                    );
+                }
             }
         }
         List<AllMenuIngredientsGetResponse> list = allMap.values().stream().toList();
         log.info("[list] {}", list);
         return list;
+    }
+
+    private static AllMenuIngredientsGetResponse.@NonNull IngredientInfo getInfo(MenuIngredient mi) {
+        return new AllMenuIngredientsGetResponse.IngredientInfo(
+                mi.getIngredient().getId(),
+                mi.getIngredient().getName(),
+                mi.getIngredient().getType(),
+                mi.getAmountType(),
+                mi.getAmountValue(),
+                mi.getAmountUnit(),
+                mi.getAmountText()
+        );
     }
 
     public boolean addCheck(Long menuId, Long userId) {
