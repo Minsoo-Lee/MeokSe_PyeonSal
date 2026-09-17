@@ -49,8 +49,16 @@ export default function HomePage() {
   const checkedCount = allMenus.filter((m) => m.checked).length
   const progressPercent = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0
 
-  const nextMenu =
-    [...allMenus].filter((m) => !m.checked).sort((a, b) => a.day - b.day)[0] ?? null
+  // "다음 메뉴"는 단순히 day가 가장 빠른 미체크 메뉴가 아니라, 마지막으로 체크한 날 "이후"의
+  // 미체크 메뉴를 우선한다 (중간에 별로여서 건너뛴 메뉴를 다시 추천하지 않기 위해).
+  // 마지막 체크가 최종일(예: 61일차)이라 이후 메뉴가 없으면, 그제서야 건너뛴 메뉴 중
+  // day가 가장 작은(1에 가까운) 것을 보여준다. 미체크 메뉴 자체가 없으면 전부 완료.
+  const checkedDays = allMenus.filter((m) => m.checked).map((m) => m.day)
+  const lastCheckedDay = checkedDays.length > 0 ? Math.max(...checkedDays) : null
+  const uncheckedMenusByDay = [...allMenus].filter((m) => !m.checked).sort((a, b) => a.day - b.day)
+  const afterLastChecked =
+    lastCheckedDay !== null ? uncheckedMenusByDay.filter((m) => m.day > lastCheckedDay) : uncheckedMenusByDay
+  const nextMenu = afterLastChecked[0] ?? uncheckedMenusByDay[0] ?? null
   const nextMenuIngredientNames = nextMenu
     ? (nextMenu.ingredientInfos ?? []).map((ing) => ing.name)
     : []
