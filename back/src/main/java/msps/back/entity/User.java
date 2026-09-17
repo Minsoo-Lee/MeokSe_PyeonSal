@@ -27,6 +27,10 @@ public class User extends TimeBaseEntity {
     @Setter
     private boolean nicknameSet;
 
+    // 업데이트 배너를 마지막으로 확인(닫기)했을 때의 앱 버전. null이면 아직 한 번도 안 본 것.
+    @Setter
+    private String lastSeenVersion;
+
     //== Constructor ==//
     public User() { }
 

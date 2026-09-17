@@ -37,6 +37,7 @@ BEGIN
         `provider` VARCHAR(50) NOT NULL,
         `provider_id` VARCHAR(255) NOT NULL,
         `nickname_set` BOOLEAN NOT NULL DEFAULT FALSE,
+        `last_seen_version` VARCHAR(20) NULL,
         `created_at` DATETIME(6) NULL,
         `updated_at` DATETIME(6) NULL,
         `deleted_at` DATETIME(6) NULL,

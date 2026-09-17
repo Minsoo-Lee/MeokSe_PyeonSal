@@ -28,6 +28,10 @@ server:
   forward-headers-strategy: framework
 
 app:
+  # 홈 화면 상단 업데이트 배너에 쓰는 값. 릴리즈할 때마다 CHANGELOG.md 버전과 같이 올릴 것.
+  version: "0.2.0"
+  update-note: "홈 화면이 추가됐어요 🎉"
+
   auth:
     allowed-emails: ${ALLOWED_EMAILS}
 
