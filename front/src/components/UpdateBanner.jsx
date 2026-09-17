@@ -33,9 +33,10 @@ export default function UpdateBanner() {
         className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <p className="text-3xl">🎉</p>
-        <h2 className="mt-3 text-lg font-bold text-stone-900">새로운 업데이트!</h2>
-        <p className="mt-2 text-sm leading-relaxed text-stone-600">{user.updateNote}</p>
+        <h2 className="text-lg font-bold text-stone-900">🎉 새로운 업데이트! 🎉</h2>
+        <p className="mt-4 whitespace-pre-line text-sm leading-loose text-stone-600">
+          {user.updateNote}
+        </p>
 
         <button
           type="button"
