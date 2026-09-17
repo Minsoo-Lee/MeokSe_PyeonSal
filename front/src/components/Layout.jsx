@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import UpdateBanner from './UpdateBanner'
 
@@ -17,10 +17,10 @@ export default function Layout() {
     <div className="min-h-screen bg-stone-50">
       <header className="border-b border-stone-200 bg-white">
         <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6">
-          <div>
+          <Link to="/" className="transition hover:opacity-80">
             <p className="text-lg font-semibold text-stone-900">먹세편살</p>
             <p className="text-xs text-stone-500">레시피 &amp; 재료 확인</p>
-          </div>
+          </Link>
           <nav className="flex flex-wrap items-center gap-2">
             <NavLink to="/" end className={navLinkClass}>
               홈
