@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>먹세편살 — 홈 화면 와이어프레임 (반응형)</title>
+<style>
+  :root{
+    --stone-50:#fafaf9; --stone-100:#f5f5f4; --stone-200:#e7e5e4; --stone-300:#d6d3d1;
+    --stone-400:#a8a29e; --stone-500:#78716c; --stone-600:#57534e; --stone-900:#1c1917;
+    --orange-50:#fff7ed; --orange-100:#ffedd5; --orange-200:#fed7aa; --orange-400:#fb923c;
+    --orange-500:#f97316; --orange-600:#ea580c; --orange-700:#c2410c;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--stone-50);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    color:var(--stone-900);
+  }
+
+  /* ---- floating mode indicator ---- */
+  .mode-badge{
+    position:fixed; top:12px; right:12px; z-index:50;
+    background:var(--stone-900); color:#fff; font-size:11px; font-weight:700;
+    padding:6px 12px; border-radius:999px; box-shadow:0 4px 10px rgba(0,0,0,.2);
+  }
+  .mode-badge .desktop-label{ display:none; }
+  .mode-badge .mobile-label{ display:inline; }
+  @media (min-width:860px){
+    .mode-badge .desktop-label{ display:inline; }
+    .mode-badge .mobile-label{ display:none; }
+  }
+
+  .banner{
+    background:var(--orange-50); border-bottom:1px solid var(--orange-200);
+    text-align:center; font-size:12.5px; color:var(--orange-700); padding:8px 16px;
+  }
+
+  /* ---- app header (실제 Layout.jsx 그대로) ---- */
+  .app-header{
+    background:#fff; border-bottom:1px solid var(--stone-200);
+    padding:14px 16px; display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:8px;
+  }
+  @media (min-width:860px){ .app-header{ padding:16px 32px; } }
+  .app-title{ font-size:14px; font-weight:700; }
+  .app-title small{ display:block; font-weight:400; font-size:10px; color:var(--stone-500); }
+  @media (min-width:860px){
+    .app-title{ font-size:16px; }
+    .app-title small{ font-size:11px; }
+  }
+  .headerright{ display:flex; align-items:center; }
+  .navpills{ display:flex; gap:4px; flex-wrap:wrap; }
+  .navpill{ font-size:10px; padding:5px 8px; border-radius:999px; color:var(--stone-500); }
+  @media (min-width:860px){ .navpill{ font-size:12px; padding:7px 14px; } }
+  .navpill.active{ background:var(--orange-500); color:#fff; font-weight:600; }
+  .user-area{
+    display:flex; align-items:center; gap:8px; margin-left:8px; padding-left:12px;
+    border-left:1px solid var(--stone-200);
+  }
+  .user-name{ font-size:11px; font-weight:600; color:var(--stone-600); white-space:nowrap; }
+  .logout-btn{ font-size:10px; font-weight:600; color:var(--stone-500); padding:5px 10px; border-radius:999px; white-space:nowrap; }
+  @media (min-width:860px){
+    .user-name{ font-size:13px; }
+    .logout-btn{ font-size:11px; padding:6px 12px; }
+  }
+
+  /* ---- content ---- */
+  .content{ max-width:900px; margin:0 auto; padding:20px 16px 48px; }
+  @media (min-width:860px){ .content{ padding:32px; } }
+
+  .rel{ position:relative; margin-bottom:18px; }
+  @media (min-width:860px){ .rel{ margin-bottom:22px; } }
+
+  .badge-num{
+    position:absolute; top:-8px; left:-8px; width:20px; height:20px; border-radius:999px;
+    background:var(--stone-900); color:#fff; font-size:11px; font-weight:700;
+    display:flex; align-items:center; justify-content:center; z-index:2;
+  }
+
+  /* 1. 인사말 + 진행 현황 */
+  .row-a{ display:flex; flex-direction:column; gap:14px; }
+  @media (min-width:860px){
+    .row-a{ flex-direction:row; align-items:center; justify-content:space-between; gap:20px; }
+  }
+  .greeting{ font-size:16px; font-weight:700; margin:0 0 2px; }
+  .greeting-sub{ font-size:12px; color:var(--stone-500); margin:0; }
+  @media (min-width:860px){ .greeting{ font-size:19px; } .greeting-sub{ font-size:13px; } }
+
+  .progress-card{
+    background:#fff; border:1px solid var(--stone-200); border-radius:14px; padding:14px;
+  }
+  .progress-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; }
+  .progress-label{ font-size:12px; color:var(--stone-600); font-weight:600; }
+  .progress-count{ font-size:12px; color:var(--orange-600); font-weight:700; }
+  .progress-track{ height:8px; background:var(--stone-100); border-radius:999px; overflow:hidden; }
+  .progress-fill{ height:100%; width:38%; background:var(--orange-400); border-radius:999px; }
+  /* 데스크탑에서는 카드가 아니라 인사말 옆의 작은 위젯으로 압축 */
+  @media (min-width:860px){
+    .progress-card{ display:flex; align-items:center; gap:12px; padding:10px 16px; min-width:260px; }
+    .progress-top{ margin-bottom:0; flex-direction:column; align-items:flex-start; gap:1px; white-space:nowrap; }
+  }
+
+  /* 3. 다음 메뉴 하이라이트 */
+  .highlight{
+    background:linear-gradient(120deg, var(--orange-50), #fff);
+    border:1.5px solid var(--orange-200); border-radius:16px; padding:16px;
+    display:flex; flex-direction:column; gap:14px;
+  }
+  @media (min-width:860px){
+    .highlight{ flex-direction:row; align-items:center; justify-content:space-between; padding:22px 26px; }
+  }
+  .highlight-left{ display:flex; align-items:center; gap:14px; }
+  .highlight-emoji{ font-size:28px; }
+  @media (min-width:860px){ .highlight-emoji{ font-size:34px; } }
+  .highlight-eyebrow{ font-size:10px; font-weight:700; color:var(--orange-700); text-transform:uppercase; letter-spacing:.03em; margin:0 0 6px; }
+  .highlight-day{ display:inline-block; background:var(--orange-100); color:var(--orange-700); font-size:11px; font-weight:700; padding:3px 9px; border-radius:999px; margin-bottom:8px; }
+  .highlight-name{ font-size:16px; font-weight:700; margin:0 0 4px; }
+  @media (min-width:860px){ .highlight-name{ font-size:19px; } }
+  .highlight-desc{ font-size:12px; color:var(--stone-500); margin:0; }
+  .btn-primary{
+    display:block; text-align:center; background:var(--orange-500); color:#fff; font-size:12.5px; font-weight:700;
+    padding:10px 16px; border-radius:10px;
+  }
+  @media (min-width:860px){ .btn-primary{ display:inline-block; flex:0 0 auto; white-space:nowrap; padding:11px 22px; } }
+
+  /* 4+5. 즐겨찾기 + 바로가기 (같은 그룹 안에서 배치만 전환) */
+  .row-c{ display:block; }
+  @media (min-width:860px){
+    .row-c{ display:grid; grid-template-columns:2fr 1fr; gap:20px; align-items:start; }
+  }
+
+  .sec-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .sec-title{ font-size:13px; font-weight:700; }
+  @media (min-width:860px){ .sec-title{ font-size:14px; } }
+  .sec-link{ font-size:11px; color:var(--orange-600); font-weight:600; }
+  @media (min-width:860px){ .sec-link{ font-size:12px; } }
+
+  /* 모바일: 가로 스크롤 / 데스크탑: 3열 그리드 */
+  .fav-list{ display:flex; gap:8px; overflow-x:auto; padding-bottom:2px; }
+  @media (min-width:860px){
+    .fav-list{ display:grid; grid-template-columns:repeat(3,1fr); overflow:visible; }
+  }
+  .fav-card{ flex:0 0 auto; width:120px; background:#fff; border:1px solid var(--stone-200); border-radius:12px; padding:10px; }
+  @media (min-width:860px){ .fav-card{ width:auto; padding:12px; } }
+  .fav-day{ font-size:9px; font-weight:700; color:var(--orange-700); background:var(--orange-100); border-radius:999px; padding:2px 6px; display:inline-block; margin-bottom:6px; }
+  .heart{ float:right; font-size:11px; color:var(--orange-400); }
+  .fav-name{ font-size:11px; font-weight:600; line-height:1.3; margin:0; }
+
+  .tiles-section{ margin-top:18px; }
+  @media (min-width:860px){ .tiles-section{ margin-top:0; } }
+
+  /* 모바일: 2열 그리드 / 데스크탑: 세로 스택(사이드바) */
+  .tiles{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  @media (min-width:860px){ .tiles{ display:flex; flex-direction:column; } }
+  .tile{ background:#fff; border:1px solid var(--stone-200); border-radius:14px; padding:14px 12px; }
+  @media (min-width:860px){ .tile{ display:flex; align-items:center; gap:12px; padding:14px; } }
+  .tile-icon{ font-size:18px; margin-bottom:6px; display:block; }
+  @media (min-width:860px){ .tile-icon{ font-size:20px; margin-bottom:0; } }
+  .tile-title{ font-size:12px; font-weight:700; margin:0 0 2px; }
+  @media (min-width:860px){ .tile-title{ font-size:12.5px; } }
+  .tile-sub{ font-size:10px; color:var(--stone-500); margin:0; }
+
+  /* ---- notes ---- */
+  .notes{ max-width:900px; margin:0 auto 40px; padding:0 16px; display:grid; grid-template-columns:1fr; gap:10px; }
+  @media (min-width:860px){ .notes{ grid-template-columns:1fr 1fr; padding:0 32px; } }
+  .note{
+    background:#fff; border:1px solid var(--stone-200); border-radius:12px; padding:12px 14px;
+    display:flex; gap:10px; font-size:12.5px; line-height:1.55; color:var(--stone-600);
+  }
+  .note b{
+    flex:0 0 auto; width:22px; height:22px; border-radius:999px; background:var(--stone-900); color:#fff;
+    font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center;
+  }
+  .note .t{ font-weight:700; color:var(--stone-900); display:block; margin-bottom:2px; }
+  .note.tip{ background:var(--orange-50); border-color:var(--orange-200); grid-column:1 / -1; }
+</style>
+</head>
+<body>
+
+<div class="mode-badge">
+  <span class="mobile-label">📱 모바일 레이아웃</span>
+  <span class="desktop-label">🖥️ 데스크탑 레이아웃</span>
+</div>
+
+<div class="banner">브라우저 창 너비를 줄이거나 늘려보면 실시간으로 바뀌어요 — 본문은 860px 기준 전환, 헤더는 폭이 부족하면 그때그때 알아서 줄바꿈돼요.</div>
+
+<div class="app-header">
+  <div class="app-title">먹세편살<small>레시피 &amp; 재료 확인</small></div>
+  <div class="headerright">
+    <div class="navpills">
+      <span class="navpill active">홈</span>
+      <span class="navpill">일별 메뉴</span>
+      <span class="navpill">재료 확인</span>
+      <span class="navpill">즐겨찾기</span>
+      <div class="user-area">
+        <span class="user-name">민수님</span>
+        <span class="logout-btn">로그아웃</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="rel row-a">
+    <span class="badge-num">1</span>
+    <div>
+      <p class="greeting">민수님, 안녕하세요 👋</p>
+      <p class="greeting-sub">오늘은 뭘 만들어볼까요?</p>
+    </div>
+    <div class="progress-card">
+      <div class="progress-top">
+        <span class="progress-label">진행 현황</span>
+        <span class="progress-count">23 / 60일 완료</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill"></div></div>
+    </div>
+  </div>
+
+  <div class="rel">
+    <span class="badge-num">3</span>
+    <div class="highlight">
+      <div class="highlight-left">
+        <span class="highlight-emoji">🍲</span>
+        <div>
+          <p class="highlight-eyebrow">다음 메뉴</p>
+          <span class="highlight-day">24일차</span>
+          <p class="highlight-name">두부조림 &amp; 계란찜</p>
+          <p class="highlight-desc">아직 안 만들어본 메뉴예요. 필요한 재료도 같이 확인해보세요.</p>
+        </div>
+      </div>
+      <span class="btn-primary">레시피 보기 →</span>
+    </div>
+  </div>
+
+  <div class="rel row-c">
+    <span class="badge-num">4</span>
+    <div>
+      <div class="sec-head">
+        <span class="sec-title">즐겨찾기</span>
+        <span class="sec-link">전체보기 →</span>
+      </div>
+      <div class="fav-list">
+        <div class="fav-card"><span class="heart">♥</span><span class="fav-day">7일차</span><p class="fav-name">김치찌개</p></div>
+        <div class="fav-card"><span class="heart">♥</span><span class="fav-day">15일차</span><p class="fav-name">제육볶음</p></div>
+        <div class="fav-card"><span class="heart">♥</span><span class="fav-day">19일차</span><p class="fav-name">순두부찌개</p></div>
+      </div>
+    </div>
+
+    <div class="tiles-section" style="position:relative;">
+      <span class="badge-num" style="left:auto; right:-8px;">5</span>
+      <div class="tiles">
+        <div class="tile"><span class="tile-icon">📅</span><div><p class="tile-title">일별 메뉴</p><p class="tile-sub">전체 목록 보기</p></div></div>
+        <div class="tile"><span class="tile-icon">🧺</span><div><p class="tile-title">재료 모아보기</p><p class="tile-sub">여러 날 한번에</p></div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="notes">
+  <div class="note"><b>H</b><div><span class="t">헤더 (최근 반영분)</span>프로필 사진 대신 "OOO님" 텍스트로 표시. 네비+이름+로그아웃이 한 줄에 안 들어가면 <code>flex-wrap</code>으로 자동 줄바꿈 (고정 breakpoint 없이 내용 길이에 따라 유동적으로).</div></div>
+  <div class="note"><b>1</b><div><span class="t">인사말 + 진행 현황</span>좁을 땐 카드가 아래로 쌓이고, 넓을 땐 인사말 옆의 작은 위젯으로 압축됨. 같은 HTML, 같은 데이터 — CSS만 전환.</div></div>
+  <div class="note"><b>3</b><div><span class="t">다음 메뉴 하이라이트</span>좁을 땐 세로(뱃지→제목→설명→버튼), 넓을 땐 가로(아이콘+텍스트 | 버튼). 콘텐츠는 동일.</div></div>
+  <div class="note"><b>4</b><div><span class="t">즐겨찾기</span>좁을 땐 가로 스크롤 목록, 넓을 땐 3열 그리드로 한 번에 다 보여줌.</div></div>
+  <div class="note"><b>5</b><div><span class="t">바로가기 타일</span>좁을 땐 즐겨찾기 아래에 2열 그리드, 넓을 땐 즐겨찾기 옆에 세로 사이드바로 이동.</div></div>
+  <div class="note tip"><b>!</b><div><span class="t">구현 관련 메모</span>여기 쓴 860px 기준으로 실제로는 Tailwind <code>lg:</code>(1024px) 프리픽스를 쓰면 <code>IngredientCheckPage</code>의 <code>lg:grid-cols-2</code> 패턴이랑 브레이크포인트가 통일돼서 더 일관될 거야. 구조 자체는 지금 두 개 와이어프레임과 완전히 똑같고, 미디어 쿼리 전환 지점만 하나로 합친 거임.</div></div>
+</div>
+
+</body>
+</html>
