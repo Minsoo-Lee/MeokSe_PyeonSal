@@ -22,8 +22,53 @@ import json
 from datetime import datetime
 
 import pymysql
+import requests
 
 import config
+
+
+# 화질 좋은 순서대로 시도. 쇼츠(세로 영상)는 maxresdefault가 원본 해상도(세로)로
+# 나오는 경우가 많아서 9:16 박스에 거의 그대로 맞고, 화질도 제일 좋다. 못 구하면
+# 점점 낮은 해상도로 내려가면서 재시도.
+THUMBNAIL_CANDIDATES = ["maxresdefault.jpg", "sddefault.jpg", "hqdefault.jpg"]
+
+# 유튜브 CDN은 요청한 해상도가 실제로 없어도 200 OK와 함께 작은 회색 placeholder
+# 이미지를 내려준다(고정된 크기의 더미 이미지). 진짜 썸네일은 보통 수십 KB인데
+# placeholder는 이보다 훨씬 작으므로, 이 바이트 수보다 작으면 "이 해상도는 없다"로
+# 보고 다음 후보로 넘어간다.
+MIN_THUMBNAIL_BYTES = 2000
+
+
+def download_thumbnail(video_id: str) -> None:
+    """유튜브 CDN에서 썸네일을 내려받아 docker/thumbnails/{video_id}.jpg로 저장한다.
+
+    이미 파일이 있으면 건너뛴다(재실행해도 중복 다운로드 안 함). 실패해도(영상이
+    비공개로 바뀌었거나 네트워크 문제 등) 메뉴 적재 자체를 막을 정도는 아니라서,
+    경고만 출력하고 계속 진행한다 — 프론트는 썸네일이 없으면 이미지가 안 뜨는 정도로
+    그친다.
+    """
+    if not video_id:
+        return
+
+    dest = config.THUMBNAILS_DIR / f"{video_id}.jpg"
+    if dest.exists():
+        return
+
+    for filename in THUMBNAIL_CANDIDATES:
+        url = f"https://img.youtube.com/vi/{video_id}/{filename}"
+        try:
+            resp = requests.get(url, timeout=10)
+            resp.raise_for_status()
+        except Exception:  # noqa: BLE001 - 이 해상도만 실패한 거니 다음 후보로
+            continue
+
+        if len(resp.content) < MIN_THUMBNAIL_BYTES:
+            continue  # placeholder로 판단, 다음 후보로
+
+        dest.write_bytes(resp.content)
+        return
+
+    print(f"  ⚠ 썸네일 다운로드 실패 (video_id={video_id}): 사용 가능한 해상도를 찾지 못함")
 
 
 def get_connection():
@@ -110,6 +155,7 @@ def main() -> None:
                 menu_id = day
                 sql_statements.append(cursor.mogrify(menu_sql, menu_params) + ";")
                 inserted_menus += 1
+                download_thumbnail(record.get("video_id", ""))
 
                 for ing in record.get("ingredients", []):
                     name = (ing.get("name") or "").strip()

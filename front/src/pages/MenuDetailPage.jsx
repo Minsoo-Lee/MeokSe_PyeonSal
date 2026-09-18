@@ -81,6 +81,12 @@ export default function MenuDetailPage() {
     (a, b) => ingredientTypeRank(a.type) - ingredientTypeRank(b.type) || a.name.localeCompare(b.name)
   )
 
+  // 0일차(만능양념장)는 1일차 영상에 곁다리로 나오는 거라, 영상 썸네일이 실제로는
+  // 1일차 요리(제육볶음) 완성 사진이다. 0일차 페이지에 그 사진을 보여주면 메뉴랑
+  // 안 맞으니, 썸네일만 숨기고 "원본 영상 보기" 링크는 그대로 둔다(그 영상 안에
+  // 양념장 만드는 과정이 실제로 있으므로).
+  const showThumbnail = !!menu.videoId && menu.day !== 0
+
   return (
     <section>
       <Link
@@ -103,32 +109,45 @@ export default function MenuDetailPage() {
         <h1 className="mt-5 text-2xl font-bold text-stone-900">{menu.name}</h1>
       </div>
 
-      <div className="mb-5 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-stone-100 text-stone-600">
-            <tr>
-              <th className="px-4 py-3 font-medium">재료 이름</th>
-              <th className="px-4 py-3 font-medium">양</th>
-              <th className="px-4 py-3 font-medium">분류</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-100">
-            {rows.map((row, idx) => (
-              <tr key={idx}>
-                <td className="px-4 py-3 font-medium text-stone-900">{row.name}</td>
-                <td className="px-4 py-3 text-stone-700">{row.amount}</td>
-                <td className="px-4 py-3 text-stone-500">{row.type}</td>
-              </tr>
-            ))}
-            {rows.length === 0 && (
+      <div className={`mb-5 lg:items-start ${showThumbnail ? 'lg:grid lg:grid-cols-[1fr_2fr] lg:gap-5' : ''}`}>
+        {showThumbnail && (
+          <img
+            src={`/thumbnails/${menu.videoId}.jpg`}
+            alt={`${menu.name} 썸네일`}
+            className="mx-auto mb-5 aspect-[9/16] w-full max-w-[260px] rounded-xl border border-stone-200 bg-stone-100 object-cover lg:mx-0 lg:mb-0 lg:max-w-none"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none'
+            }}
+          />
+        )}
+
+        <div className="overflow-hidden rounded-xl border border-stone-200 bg-white">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-stone-100 text-stone-600">
               <tr>
-                <td colSpan={3} className="px-4 py-10 text-center text-stone-400">
-                  등록된 재료가 없습니다.
-                </td>
+                <th className="px-4 py-3 font-medium">재료 이름</th>
+                <th className="px-4 py-3 font-medium">양</th>
+                <th className="px-4 py-3 font-medium">분류</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-stone-100">
+              {rows.map((row, idx) => (
+                <tr key={idx}>
+                  <td className="px-4 py-3 font-medium text-stone-900">{row.name}</td>
+                  <td className="px-4 py-3 text-stone-700">{row.amount}</td>
+                  <td className="px-4 py-3 text-stone-500">{row.type}</td>
+                </tr>
+              ))}
+              {rows.length === 0 && (
+                <tr>
+                  <td colSpan={3} className="px-4 py-10 text-center text-stone-400">
+                    등록된 재료가 없습니다.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div className="rounded-xl border border-stone-200 bg-white p-4">
@@ -152,9 +171,12 @@ export default function MenuDetailPage() {
             </p>
           </div>
           <img
-            src={`https://img.youtube.com/vi/${menu.videoId}/hqdefault.jpg`}
+            src={`/thumbnails/${menu.videoId}.jpg`}
             alt="원본 영상 썸네일"
             className="h-24 w-40 flex-shrink-0 object-cover"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none'
+            }}
           />
         </a>
       )}

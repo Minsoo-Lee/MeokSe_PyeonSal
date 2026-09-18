@@ -31,6 +31,10 @@ front/node_modules/
 front/dist/
 front/.next/
 
+# ===== docker/thumbnails/ (prep가 내려받는 메뉴 썸네일, 용량 커서 git에 안 올림) =====
+docker/thumbnails/*
+!docker/thumbnails/.gitkeep
+
 # ===== IDE =====
 .idea/
 .vscode/
