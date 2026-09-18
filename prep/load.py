@@ -22,8 +22,33 @@ import json
 from datetime import datetime
 
 import pymysql
+import requests
 
 import config
+
+
+def download_thumbnail(video_id: str) -> None:
+    """유튜브 CDN에서 썸네일을 내려받아 docker/thumbnails/{video_id}.jpg로 저장한다.
+
+    이미 파일이 있으면 건너뛴다(재실행해도 중복 다운로드 안 함). 실패해도(영상이
+    비공개로 바뀌었거나 네트워크 문제 등) 메뉴 적재 자체를 막을 정도는 아니라서,
+    경고만 출력하고 계속 진행한다 — 프론트는 썸네일이 없으면 이미지가 안 뜨는 정도로
+    그친다.
+    """
+    if not video_id:
+        return
+
+    dest = config.THUMBNAILS_DIR / f"{video_id}.jpg"
+    if dest.exists():
+        return
+
+    url = f"https://img.youtube.com/vi/{video_id}/hqdefault.jpg"
+    try:
+        resp = requests.get(url, timeout=10)
+        resp.raise_for_status()
+        dest.write_bytes(resp.content)
+    except Exception as exc:  # noqa: BLE001 - 썸네일 실패는 치명적이지 않으므로 건너뛰고 계속 진행
+        print(f"  ⚠ 썸네일 다운로드 실패 (video_id={video_id}): {exc}")
 
 
 def get_connection():
@@ -110,6 +135,7 @@ def main() -> None:
                 menu_id = day
                 sql_statements.append(cursor.mogrify(menu_sql, menu_params) + ";")
                 inserted_menus += 1
+                download_thumbnail(record.get("video_id", ""))
 
                 for ing in record.get("ingredients", []):
                     name = (ing.get("name") or "").strip()

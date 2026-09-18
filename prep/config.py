@@ -14,6 +14,10 @@ DATA_DIR = BASE_DIR / "data"
 EXTRACTED_DIR = DATA_DIR / "extracted"
 PROCESSED_VIDEOS_FILE = DATA_DIR / "processed_videos.json"
 
+# 메뉴 썸네일 저장 위치. front/docker-compose.yml이 이 폴더를 nginx 컨테이너에
+# bind mount 해서 /thumbnails/{video_id}.jpg로 그대로 서빙한다.
+THUMBNAILS_DIR = BASE_DIR.parent / "docker" / "thumbnails"
+
 PLAYLIST_URL = os.getenv("PLAYLIST_URL", "")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
@@ -26,3 +30,4 @@ DB_NAME = os.getenv("DB_NAME", "msps")
 
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 EXTRACTED_DIR.mkdir(parents=True, exist_ok=True)
+THUMBNAILS_DIR.mkdir(parents=True, exist_ok=True)
