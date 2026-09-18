@@ -81,6 +81,12 @@ export default function MenuDetailPage() {
     (a, b) => ingredientTypeRank(a.type) - ingredientTypeRank(b.type) || a.name.localeCompare(b.name)
   )
 
+  // 0일차(만능양념장)는 1일차 영상에 곁다리로 나오는 거라, 영상 썸네일이 실제로는
+  // 1일차 요리(제육볶음) 완성 사진이다. 0일차 페이지에 그 사진을 보여주면 메뉴랑
+  // 안 맞으니, 썸네일만 숨기고 "원본 영상 보기" 링크는 그대로 둔다(그 영상 안에
+  // 양념장 만드는 과정이 실제로 있으므로).
+  const showThumbnail = !!menu.videoId && menu.day !== 0
+
   return (
     <section>
       <Link
@@ -103,18 +109,16 @@ export default function MenuDetailPage() {
         <h1 className="mt-5 text-2xl font-bold text-stone-900">{menu.name}</h1>
       </div>
 
-      <div className="mb-5 lg:grid lg:grid-cols-2 lg:items-start lg:gap-5">
-        {menu.videoId && (
-          <div className="mb-5 flex justify-center overflow-hidden rounded-xl border border-stone-200 bg-stone-100 lg:mb-0 lg:justify-start">
-            <img
-              src={`/thumbnails/${menu.videoId}.jpg`}
-              alt={`${menu.name} 썸네일`}
-              className="aspect-[9/16] w-full max-w-[260px] object-cover"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none'
-              }}
-            />
-          </div>
+      <div className={`mb-5 lg:items-start ${showThumbnail ? 'lg:grid lg:grid-cols-[1fr_2fr] lg:gap-5' : ''}`}>
+        {showThumbnail && (
+          <img
+            src={`/thumbnails/${menu.videoId}.jpg`}
+            alt={`${menu.name} 썸네일`}
+            className="mx-auto mb-5 aspect-[9/16] w-full max-w-[260px] rounded-xl border border-stone-200 bg-stone-100 object-cover lg:mx-0 lg:mb-0 lg:max-w-none"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none'
+            }}
+          />
         )}
 
         <div className="overflow-hidden rounded-xl border border-stone-200 bg-white">
