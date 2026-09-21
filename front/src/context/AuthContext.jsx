@@ -46,6 +46,29 @@ export function AuthProvider({ children }) {
     }
   }, [token])
 
+  // 탭/앱을 백그라운드에 두었다가(로그아웃 없이) 다시 돌아왔을 때 유저 정보를 다시 받아온다.
+  // 모바일은 브라우저/PWA가 탭을 완전히 새로고침하지 않고 화면만 다시 보여주는 경우가
+  // 많아서, 마운트 시에만 호출되는 위 effect만으로는 새 버전 안내 모달이 안 뜨고(=확인을
+  // 안 누르니 lastSeenVersion도 갱신 안 됨) 계속 예전 버전 상태로 머물러있는 문제가 있었다.
+  useEffect(() => {
+    if (!token) return
+
+    function handleVisibilityChange() {
+      if (document.visibilityState === 'visible') {
+        fetchMe()
+          .then((data) => setUser(data))
+          .catch(() => {
+            clearToken()
+            setTokenState(null)
+            setUser(null)
+          })
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, [token])
+
   const login = useCallback((newToken) => {
     persistToken(newToken)
     setTokenState(newToken)
