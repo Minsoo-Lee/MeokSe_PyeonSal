@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { fetchFavoriteMenus, toggleFavorite } from '../api/menu'
 import { getMainIngredientSummary } from '../utils/mainIngredientSummary'
 import { CommentBadge, FavoriteBadge } from '../components/RecipeBadgeButtons'
+import CommentModal from '../components/CommentModal'
 import Pagination from '../components/Pagination'
 
 const PAGE_SIZE = 8
@@ -14,6 +15,7 @@ export default function FavoritesPage() {
   const [menus, setMenus] = useState([])
   const [totalCount, setTotalCount] = useState(0)
   const [status, setStatus] = useState('loading') // 'loading' | 'error' | 'done'
+  const [commentMenu, setCommentMenu] = useState(null) // 코멘트 모달 대상 메뉴
 
   useEffect(() => {
     let ignore = false
@@ -57,6 +59,11 @@ export default function FavoritesPage() {
     })
   }
 
+  // 코멘트 저장 성공 시: 서버가 돌려준 값으로 해당 카드의 배지(파랑/흑백)를 갱신
+  function handleCommentSaved(menuId, comment) {
+    setMenus((prev) => prev.map((m) => (m.menuId === menuId ? { ...m, comment } : m)))
+  }
+
   return (
     <section>
       <div className="mb-6">
@@ -83,12 +90,20 @@ export default function FavoritesPage() {
                     <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700">
                       {menu.day}일차
                     </span>
-                    <div className="flex flex-col items-end gap-1.5">
-                      <FavoriteBadge favorite onToggle={(e) => handleUnfavorite(e, menu)} />
-                      <CommentBadge comment={menu.comment} />
-                    </div>
+                    <FavoriteBadge favorite onToggle={(e) => handleUnfavorite(e, menu)} />
                   </div>
-                  <p className="mt-3 text-lg font-semibold text-stone-900">{menu.name}</p>
+                  <div className="mt-3 flex items-center justify-between gap-2">
+                    <p className="min-w-0 text-lg font-semibold text-stone-900">{menu.name}</p>
+                    <CommentBadge
+                      className="shrink-0"
+                      comment={menu.comment}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        setCommentMenu(menu)
+                      }}
+                    />
+                  </div>
                   <p className="mt-1 text-sm text-stone-500">
                     {getMainIngredientSummary(menu.ingredientNames)}
                   </p>
@@ -108,6 +123,11 @@ export default function FavoritesPage() {
           )}
         </>
       )}
+      <CommentModal
+        menu={commentMenu}
+        onClose={() => setCommentMenu(null)}
+        onSaved={handleCommentSaved}
+      />
     </section>
   )
 }

@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { fetchMenuDetail, toggleChecked, toggleFavorite } from '../api/menu'
-import { CheckBadge, FavoriteBadge } from '../components/RecipeBadgeButtons'
+import { CheckBadge, CommentBadge, FavoriteBadge } from '../components/RecipeBadgeButtons'
+import CommentModal from '../components/CommentModal'
 import { ingredientTypeRank } from '../utils/ingredientTypeOrder'
 
 export default function MenuDetailPage() {
   const { menuId } = useParams()
   const [menu, setMenu] = useState(null)
   const [status, setStatus] = useState('loading') // 'loading' | 'error' | 'done'
+  const [commentMenu, setCommentMenu] = useState(null) // 코멘트 모달 대상 (열려 있을 때만 값 있음)
 
   useEffect(() => {
     let ignore = false
@@ -52,6 +54,11 @@ export default function MenuDetailPage() {
       .catch(() => {
         setMenu((prev) => (prev ? { ...prev, checked: !prev.checked } : prev))
       })
+  }
+
+  // 코멘트 저장 성공 시: 서버가 돌려준 값으로 배지(파랑/흑백)를 갱신
+  function handleCommentSaved(_menuId, comment) {
+    setMenu((prev) => (prev ? { ...prev, comment } : prev))
   }
 
   if (status === 'loading') {
@@ -104,6 +111,10 @@ export default function MenuDetailPage() {
           <div className="flex items-center gap-2">
             <CheckBadge checked={!!menu.checked} onToggle={handleToggleChecked} />
             <FavoriteBadge favorite={!!menu.favorite} onToggle={handleToggleFavorite} />
+            <CommentBadge
+              comment={menu.comment}
+              onClick={() => setCommentMenu({ menuId, name: menu.name, comment: menu.comment })}
+            />
           </div>
         </div>
         <h1 className="mt-5 text-2xl font-bold text-stone-900">{menu.name}</h1>
@@ -210,6 +221,11 @@ export default function MenuDetailPage() {
           </span>
         )}
       </div>
+      <CommentModal
+        menu={commentMenu}
+        onClose={() => setCommentMenu(null)}
+        onSaved={handleCommentSaved}
+      />
     </section>
   )
 }

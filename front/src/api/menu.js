@@ -76,3 +76,37 @@ export async function toggleChecked(id) {
 export async function fetchFavoriteMenus({ page = 1, limit = 8 } = {}) {
   return apiFetch(`/menu/favorites?page=${page}&limit=${limit}`)
 }
+
+/**
+ * 내 코멘트 조회 (GET /menu/{id}/comment). 코멘트 모달을 열 때 최신 값을 가져온다.
+ * 응답(확정 예정): { comment: string | null } - 없으면 null.
+ */
+export async function fetchComment(id) {
+  return apiFetch(`/menu/${id}/comment`)
+}
+
+/**
+ * 메뉴 코멘트 저장/수정 (POST /menu/{id}/comment). 코멘트는 1인 1메뉴 1개라서
+ * (user_id, menu_id) 행이 없으면 새로 만들고, 있으면 내용을 덮어쓴다.
+ *
+ * 요청: { content: string }  (공백 제외 1자 이상, 최대 500자. 아니면 400)
+ * 응답(확정 예정): { comment: string } - 저장 후의 실제 값.
+ *
+ * 목록/즐겨찾기/상세 응답의 MenuInfo.comment도 같은 의미(로그인한 사용자 본인의 코멘트,
+ * 없으면 null)로 내려온다 - 카드의 코멘트 배지(파랑/흑백) 표시에 쓴다.
+ */
+export async function saveComment(id, content) {
+  return apiFetch(`/menu/${id}/comment`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content }),
+  })
+}
+
+/**
+ * 메뉴 코멘트 삭제 (DELETE /menu/{id}/comment). 하드 삭제.
+ * 응답 본문은 쓰지 않는다(204 No Content 또는 200 모두 가능).
+ */
+export async function deleteComment(id) {
+  return apiFetch(`/menu/${id}/comment`, { method: 'DELETE' })
+}
