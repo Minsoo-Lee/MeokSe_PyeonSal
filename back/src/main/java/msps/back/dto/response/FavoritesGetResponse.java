@@ -9,7 +9,8 @@ public record FavoritesGetResponse(List<MenuInfo> menuInfos, int totalCount) {
             int day,
             String name,
             List<String> ingredientNames,
-            boolean favorite
+            boolean favorite,
+            String comment
     ) {}
 }
 

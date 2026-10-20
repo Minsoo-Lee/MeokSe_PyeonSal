@@ -6,11 +6,8 @@ import msps.back.dto.response.AllMenuIngredientsGetResponse;
 import msps.back.dto.response.DailyDetailGetResponse;
 import msps.back.dto.response.DailyGetResponse;
 import msps.back.dto.response.FavoritesGetResponse;
-import msps.back.entity.Check;
-import msps.back.entity.Favorite;
+import msps.back.entity.*;
 import msps.back.entity.type.AmountType;
-import msps.back.entity.Menu;
-import msps.back.entity.MenuIngredient;
 import msps.back.repository.*;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
@@ -33,6 +30,7 @@ public class MenuService {
     private final CheckRepository checkRepository;
     private final FavoriteRepository favoriteRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
     public DailyGetResponse getMenuInfos(int page, int limit, Long userId) {
         Pageable pageable = PageRequest.of(page - 1, limit);
@@ -47,8 +45,7 @@ public class MenuService {
 
         Set<Long> checks = new HashSet<>(checkRepository.findMenuIdsByUserIdAndMenuIdIn(userId, menuIds));
         Set<Long> favorites = new HashSet<>(favoriteRepository.findMenuIdsByUserIdAndMenuIdIn(userId, menuIds));
-
-
+        Map<Long, String> comments = this.getCommentsById(userId, menuIds);
 
         List<DailyGetResponse.MenuInfo> menuInfos = menus.stream()
                 .map(menu -> new DailyGetResponse.MenuInfo(
@@ -57,7 +54,8 @@ public class MenuService {
                         menu.getName(),
                         ingredientNamesByMenuId.getOrDefault(menu.getId(), List.of()),
                         checks.contains(menu.getId()),
-                        favorites.contains(menu.getId())
+                        favorites.contains(menu.getId()),
+                        comments.get(menu.getId())
                 ))
                 .toList();
 
@@ -235,7 +233,7 @@ public class MenuService {
 
         Map<Long, List<String>> ingredientNamesByMenuId = getIngredientNamesByMenuId(ingredients);
 
-        Set<Long> favorites = new HashSet<>(favoriteRepository.findMenuIdsByUserIdAndMenuIdIn(userId, menuIds));
+        Map<Long, String> comments = this.getCommentsById(userId, menuIds);
 
         List<FavoritesGetResponse.MenuInfo> menuInfos = menus.stream()
                 .map(menu -> new FavoritesGetResponse.MenuInfo(
@@ -243,10 +241,16 @@ public class MenuService {
                         menu.getDay(),
                         menu.getName(),
                         ingredientNamesByMenuId.getOrDefault(menu.getId(), List.of()),
-                        true
+                        true,
+                        comments.get(menu.getId())
                 ))
                 .toList();
 
         return new FavoritesGetResponse(menuInfos, (int) menuPage.getTotalElements());
+    }
+
+    private Map<Long, String> getCommentsById(Long userId, List<Long> menuIds) {
+        return commentRepository.findByUserIdAndMenuIdIn(userId, menuIds).stream()
+                .collect(Collectors.toMap(c -> c.getMenu().getId(), Comment::getContent));
     }
 }

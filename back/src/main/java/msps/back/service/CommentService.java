@@ -4,15 +4,11 @@ import lombok.RequiredArgsConstructor;
 import msps.back.dto.response.CommentGetResponse;
 import msps.back.dto.response.CommentSaveResponse;
 import msps.back.entity.Comment;
-import msps.back.entity.Menu;
-import msps.back.entity.User;
 import msps.back.repository.CommentRepository;
 import msps.back.repository.MenuRepository;
 import msps.back.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,23 +26,22 @@ public class CommentService {
 
     @Transactional
     public CommentSaveResponse updateComment(Long userId, Long menuId, String content) {
-        User userReference = userRepository.getReferenceById(userId);
-        Menu menuReference = menuRepository.getReferenceById(menuId);
-        List<Comment> commentList = commentRepository.findCommentByUserAndMenu(userReference, menuReference);
-        CommentSaveResponse commentSaveResponse = new CommentSaveResponse(content);
-        if (commentList.isEmpty()) {
-            Comment savedComment = commentRepository.save(
-                    new Comment(userReference, menuReference, content));
-        } else {
-            Comment comment = commentList.getFirst();
-            comment.updateContent(content);
-        }
-        return commentSaveResponse;
+        String trimmedContent = content.trim();
+        commentRepository.findByUserIdAndMenuId(userId, menuId).ifPresentOrElse(
+                comment -> comment.updateContent(content),
+                () -> commentRepository.save(new Comment(
+                        userRepository.getReferenceById(userId),
+                        menuRepository.getReferenceById(menuId),
+                        trimmedContent
+                ))
+        );
+        return new CommentSaveResponse(content);
     }
 
     @Transactional
     public void deleteComment(Long userId, Long menuId) {
-        Comment comment = commentRepository.findByUserIdAndMenuId(userId, menuId);
-        commentRepository.delete(comment);
+        commentRepository.findByUserIdAndMenuId(userId, menuId).ifPresent(
+                commentRepository::delete
+        );
     }
 }

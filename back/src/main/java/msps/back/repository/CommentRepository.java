@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
@@ -20,9 +21,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     List<Comment> findCommentByUserAndMenu(User user, Menu menu);
 
-    @Query("select c " +
-            "from Comment c " +
-            "where c.user.id = :userId " +
-            "and c.menu.id = :menuId")
-    Comment findByUserIdAndMenuId(Long userId, Long menuId);
+    Optional<Comment> findByUserIdAndMenuId(Long userId, Long menuId);
+
+    List<Comment> findByUserIdAndMenuIdIn(Long userId, List<Long> menuIds);
 }
