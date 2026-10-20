@@ -13,7 +13,7 @@ CREATE DATABASE IF NOT EXISTS msps_prod CHARACTER SET utf8mb4 COLLATE utf8mb4_un
 
 -- 프로시저는 임시로 만들어서 끝에 DROP할 거라, 어디 만들든 상관없지만
 -- CREATE PROCEDURE는 현재 선택된 DB가 있어야 하므로 하나를 선택해둔다.
-USE msps_dev;
+USE msps_prod;
 
 DELIMITER $$
 

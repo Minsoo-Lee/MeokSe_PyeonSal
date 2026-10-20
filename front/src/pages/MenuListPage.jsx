@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { fetchDailyMenus, toggleChecked, toggleFavorite } from '../api/menu'
 import { getMainIngredientSummary } from '../utils/mainIngredientSummary'
-import { CheckBadge, FavoriteBadge } from '../components/RecipeBadgeButtons'
+import { CheckBadge, CommentBadge, FavoriteBadge } from '../components/RecipeBadgeButtons'
 import Pagination from '../components/Pagination'
 
 const PAGE_SIZE = 8
@@ -108,19 +108,22 @@ export default function MenuListPage() {
                   to={`/menu/${menu.menuId}`}
                   className="block rounded-xl border border-stone-200 bg-white p-4 shadow-sm transition hover:border-orange-200 hover:shadow-md"
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-start justify-between">
                     <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700">
                       {menu.day}일차
                     </span>
-                    <div className="flex items-center gap-2">
-                      <CheckBadge
-                        checked={!!menu.checked}
-                        onToggle={(e) => handleToggleChecked(e, menu.menuId)}
-                      />
-                      <FavoriteBadge
-                        favorite={!!menu.favorite}
-                        onToggle={(e) => handleToggleFavorite(e, menu.menuId)}
-                      />
+                    <div className="flex flex-col items-end gap-1.5">
+                      <div className="flex items-center gap-2">
+                        <CheckBadge
+                          checked={!!menu.checked}
+                          onToggle={(e) => handleToggleChecked(e, menu.menuId)}
+                        />
+                        <FavoriteBadge
+                          favorite={!!menu.favorite}
+                          onToggle={(e) => handleToggleFavorite(e, menu.menuId)}
+                        />
+                      </div>
+                      <CommentBadge comment={menu.comment} />
                     </div>
                   </div>
                   <p className="mt-3 text-lg font-semibold text-stone-900">{menu.name}</p>
