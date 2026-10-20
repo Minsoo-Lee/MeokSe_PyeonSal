@@ -87,7 +87,7 @@ BEGIN
         `comment_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
         `user_id` BIGINT NOT NULL,
         `menu_id` BIGINT NOT NULL,
-        `content` VARCHAR(255),
+        `content` VARCHAR(500),
         UNIQUE KEY `uk_comment_menu_user` (`menu_id`, `user_id`),
         CONSTRAINT `fk_cmt_user` FOREIGN KEY (`user_id`) REFERENCES `', target_db, '`.`users` (`user_id`)
             ON DELETE CASCADE,
