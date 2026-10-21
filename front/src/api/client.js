@@ -32,5 +32,8 @@ export async function apiFetch(path, options = {}) {
     throw new Error(`API 요청 실패 (${res.status}): ${path}`)
   }
 
+  // DELETE처럼 본문이 없는 응답(204)은 json 파싱 없이 null로 돌려준다.
+  if (res.status === 204) return null
+
   return res.json()
 }

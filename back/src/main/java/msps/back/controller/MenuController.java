@@ -1,10 +1,14 @@
 package msps.back.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import msps.back.dto.request.CommentSaveRequest;
 import msps.back.dto.response.*;
 import msps.back.entity.User;
+import msps.back.service.CommentService;
 import msps.back.service.MenuService;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +21,7 @@ import java.util.List;
 public class MenuController {
 
     private final MenuService menuService;
+    private final CommentService commentService;
 
     @GetMapping("/daily")
     public DailyGetResponse getDailyMenus(
@@ -66,5 +71,29 @@ public class MenuController {
             @RequestParam(defaultValue = "8") int limit,
             @AuthenticationPrincipal User user) {
         return menuService.getFavoriteMenuInfos(page, limit, user.getId());
+    }
+
+    @GetMapping("/{id}/comment")
+    public CommentGetResponse getComment(
+            @PathVariable("id") Long menuId,
+            @AuthenticationPrincipal User user
+    ) {
+        return commentService.getComment(user.getId(), menuId);
+    }
+
+    @PostMapping("/{id}/comment")
+    public CommentSaveResponse saveComment(
+            @PathVariable("id") Long menuId,
+            @Valid @RequestBody CommentSaveRequest dto,
+            @AuthenticationPrincipal User user) {
+        return commentService.updateComment(user.getId(), menuId, dto.content());
+    }
+
+    @DeleteMapping("/{id}/comment")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteComment(
+            @PathVariable("id") Long menuId,
+            @AuthenticationPrincipal User user) {
+        commentService.deleteComment(user.getId(), menuId);
     }
 }

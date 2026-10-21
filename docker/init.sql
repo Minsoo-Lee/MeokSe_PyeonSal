@@ -13,7 +13,7 @@ CREATE DATABASE IF NOT EXISTS msps_prod CHARACTER SET utf8mb4 COLLATE utf8mb4_un
 
 -- 프로시저는 임시로 만들어서 끝에 DROP할 거라, 어디 만들든 상관없지만
 -- CREATE PROCEDURE는 현재 선택된 DB가 있어야 하므로 하나를 선택해둔다.
-USE msps_dev;
+USE msps_prod;
 
 DELIMITER $$
 
@@ -81,6 +81,20 @@ BEGIN
         UNIQUE KEY `uk_ingredient_name` (`name`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
     PREPARE stmt FROM @create_ingredient; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+        -- 코멘트: 1인 1메뉴 1개 (user_id + menu_id 유니크), 수정은 덮어쓰기, 삭제는 하드 삭제
+    SET @create_comment = CONCAT('CREATE TABLE IF NOT EXISTS `', target_db, '`.`comment` (
+        `comment_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+        `user_id` BIGINT NOT NULL,
+        `menu_id` BIGINT NOT NULL,
+        `content` VARCHAR(500),
+        UNIQUE KEY `uk_comment_menu_user` (`menu_id`, `user_id`),
+        CONSTRAINT `fk_cmt_user` FOREIGN KEY (`user_id`) REFERENCES `', target_db, '`.`users` (`user_id`)
+            ON DELETE CASCADE,
+        CONSTRAINT `fk_cmt_menu` FOREIGN KEY (`menu_id`) REFERENCES `', target_db, '`.`menu` (`menu_id`)
+            ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
+    PREPARE stmt FROM @create_comment; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
     SET @create_menu_ingredient = CONCAT('CREATE TABLE IF NOT EXISTS `', target_db, '`.`menu_ingredient` (
         `menu_ingredient_id` BIGINT AUTO_INCREMENT PRIMARY KEY,

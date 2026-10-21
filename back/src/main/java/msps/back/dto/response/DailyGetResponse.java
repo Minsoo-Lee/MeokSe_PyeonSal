@@ -10,7 +10,8 @@ public record DailyGetResponse(List<MenuInfo> menuInfos, int totalCount) {
             String name,
             List<String> ingredientNames,
             boolean checked,
-            boolean favorite
+            boolean favorite,
+            String comment
     ) {}
 }
 
