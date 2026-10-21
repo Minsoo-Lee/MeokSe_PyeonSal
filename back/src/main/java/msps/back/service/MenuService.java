@@ -169,9 +169,7 @@ public class MenuService {
                 }
             }
         }
-        List<AllMenuIngredientsGetResponse> list = allMap.values().stream().toList();
-        log.info("[list] {}", list);
-        return list;
+        return allMap.values().stream().toList();
     }
 
     private static AllMenuIngredientsGetResponse.@NonNull IngredientInfo getInfo(MenuIngredient mi) {
